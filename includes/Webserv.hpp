@@ -60,7 +60,8 @@
 #include "Server.hpp"
 #include "SocketHandler.hpp"
 #include "Cgi.hpp"
-#include "HttpRequest.hpp"
+#include "Logger.hpp"
+#include "SocketHandler.hpp"
 
 
 void signalHandler(int signum);

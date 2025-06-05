@@ -28,6 +28,13 @@ class Logger {
         }
 
     public:
+
+        static void init(){
+        }
+
+        static void destroy() {
+        }
+
         static void info(const std::string& message) {
             log("INFO", BLUE500, message);
         }
