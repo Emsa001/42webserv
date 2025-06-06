@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
 }
 
 TEST(socket_handler, basic) {
-	SocketHandler sh;	
+	SocketHandler sh;
+	sh.run();
 }
 
 TEST(servers, single_integration) {

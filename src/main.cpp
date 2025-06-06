@@ -37,8 +37,10 @@ int main()
 	return 0;
     //TODO: replace threads
 
-    Server s(it->getMap());
-    s.start();
+    // Server s(it->getMap());
+    // s.start();
+    SocketHandler sh;
+    sh.run();
     // TODO: initialize servers
 
     Logger::destroy();
