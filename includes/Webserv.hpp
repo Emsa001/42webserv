@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h> 
+#include <netdb.h>
 
 // network headers (for TCP)
 #include <netinet/in.h>

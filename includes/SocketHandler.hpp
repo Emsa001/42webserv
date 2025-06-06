@@ -10,11 +10,23 @@
 class SocketHandler {
 private:
     config_array _servers;
+    std::vector<pollfd> _pollfds;
+    int _num_sockets;
+
+    /* the _pollfds vector is an array of `struct pollfd` able to be passed to poll()
+    connection file descriptors are appended to the end as needed
+
+    | socket_fds | connection_fds |
+                 ^
+                _num_sockets
+    
+    */
 public:
     SocketHandler(config_array& servers);
     SocketHandler();
     ~SocketHandler();
 
+    bool InitSockets();
     int run();
 };
 
