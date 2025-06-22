@@ -45,6 +45,7 @@ bool SocketHandler::InitSockets()
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, NULL, NULL);
 
     std::cout << "socket fd is " << newfd.fd << std::endl;
     std::cout << "bind: " << bind(newfd.fd, res->ai_addr, res->ai_addrlen) << std::endl;
@@ -95,7 +96,7 @@ int SocketHandler::run()
                     std::cout << "read" << std::endl;
                     char buffer[128];
                     int res = read(it->fd, buffer, 128);
-                    if (res < 0) {
+                    if (res <= 0) {
                         perror("error: ");
                     }
                 }
