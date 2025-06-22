@@ -78,6 +78,7 @@ bool ConfigSchema::validateMap(config_map &map) const {
     for (it = nestedSchemas.find(schemaName)->second.schema.begin(); it != nestedSchemas.find(schemaName)->second.schema.end(); ++it) {
         if(map.find(it->first) != map.end()) continue;
 
+        
         if (it->second.required) {
             std::cerr << "Error: Required key '" << it->first << "' not found" << std::endl;
             return false;

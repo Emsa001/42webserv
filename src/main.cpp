@@ -23,20 +23,27 @@ int main()
     Config& config = Config::instance();
     config.parse("conf/default.yml");
 
+
+
     config_array servers = config.getServers();
-    config_array::iterator it = servers.begin();
+    config_map server1 = servers[0].getMap();
+    std::string host = Config::getSafe(server1, "host", ConfigValue((std::string)"127.0.0.1")).getString();
+    std::cout << "Starting server on " << host << std::endl;
 
-    std::vector<pthread_t> threads;
 
-    for(; it != servers.end(); it++){
-        pthread_t thread;
-        pthread_create(&thread, NULL, startServer, &it->getMap());
-        threads.push_back(thread);
-    }
+    // config_array::iterator it = servers.begin();
 
-    for(size_t i = 0; i < threads.size(); i++) {
-        pthread_join(threads[i], NULL);
-    }
+    // std::vector<pthread_t> threads;
+
+    // for(; it != servers.end(); it++){
+    //     pthread_t thread;
+    //     pthread_create(&thread, NULL, startServer, &it->getMap());
+    //     threads.push_back(thread);
+    // }
+
+    // for(size_t i = 0; i < threads.size(); i++) {
+    //     pthread_join(threads[i], NULL);
+    // }
 
     Logger::destroy();
 

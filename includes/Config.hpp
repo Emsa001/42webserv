@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/04/16 16:14:44 by escura           ###   ########.fr       */
+/*   Updated: 2025/06/22 22:00:10 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class ConfigValue {
         ConfigValue();
         ConfigValue(int i);
         ConfigValue(bool b);
+        ConfigValue(std::string &str);
         ConfigValue(const std::string &str);
         ConfigValue(const config_array &array);
         ConfigValue(const config_map &map);

@@ -20,7 +20,8 @@ ConfigSchema createSchema() {
     // Server Schema
     ConfigSchema serverSchema;
     serverSchema.addEntry("server_name", STRING, true);
-    serverSchema.addEntry("listen", INT, true);
+    serverSchema.addEntry("host", STRING, false);
+    serverSchema.addEntry("listen", STRING, true);
     serverSchema.addEntry("max_client_body_size", INT, true);
     serverSchema.addEntry("max_client_header_size", INT, true);
     serverSchema.addEntry("keep_alive", INT, false);
