@@ -23,71 +23,71 @@ server0:
         root: "/mainserver/"
         methods: "GET"
 
-# server1:
-#     server_name: "MyServer1"
-#     listen: "8080"
-#     max_client_body_size: 4096
-#     max_client_header_size: 1024
-#     keep_alive: 30
+server1:
+    server_name: "MyServer1"
+    listen: "8080"
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
 
-#     location:
-#         path: "/"
-#         root: "/myserver1/"
-#         methods: "GET"
+    location:
+        path: "/"
+        root: "/myserver1/"
+        methods: "GET"
     
-#     errors:
-#         500: "500.html"
-#         404: "myserver1/errors/404.html"
+    errors:
+        500: "500.html"
+        404: "myserver1/errors/404.html"
 
-# server2:
-#     server_name: "MyServer2"
-#     listen: "8081"
-#     max_client_body_size: 256
-#     max_client_header_size: 1024
-#     keep_alive: 5
+server2:
+    server_name: "MyServer2"
+    listen: "8081"
+    max_client_body_size: 256
+    max_client_header_size: 1024
+    keep_alive: 5
 
-#     location:
-#         path: "/"
-#         root: "/myserver2/"
-#         index: "index.html"
-#         methods: "GET"
+    location:
+        path: "/"
+        root: "/myserver2/"
+        index: "index.html"
+        methods: "GET"
 
-#     location:
-#         path: "/public"
-#         root: "/myserver2/public/"
-#         index: "/"
-#         autoindex: true
+    location:
+        path: "/public"
+        root: "/myserver2/public/"
+        index: "/"
+        autoindex: true
 
-#     location:
-#         path: "/secret"
-#         root: "/myserver2/"
-#         index: "hidden.html"
+    location:
+        path: "/secret"
+        root: "/myserver2/"
+        index: "hidden.html"
 
-#     errors:
-#         500: "500.html"
-#         404: ".mbnmk"
+    errors:
+        500: "500.html"
+        404: ".mbnmk"
 
-# server3:
-#     server_name: "MyServer3"
-#     listen: "8082"
-#     max_client_body_size: 16384
-#     max_client_header_size: 2048
-#     keep_alive: 30
+server3:
+    server_name: "MyServer3"
+    listen: "8082"
+    max_client_body_size: 16384
+    max_client_header_size: 2048
+    keep_alive: 30
 
-#     location:
-#         path: "/"
-#         root: "/myserver3/src/"
-#         index: "index.html"
-#         methods: "GET"
+    location:
+        path: "/"
+        root: "/myserver3/src/"
+        index: "index.html"
+        methods: "GET"
 
-#     location:
-#         path: "/cgi"
-#         root: "/myserver3/cgi/"
-#         index: "index.py"
-#         methods: "GET POST DELETE"
-#         exact: true
-#         cgi: true
+    location:
+        path: "/cgi"
+        root: "/myserver3/cgi/"
+        index: "index.py"
+        methods: "GET POST DELETE"
+        exact: true
+        cgi: true
     
-#     errors:
-#         500: "500.html"
-#         404: "404.html"
+    errors:
+        500: "500.html"
+        404: "404.html"

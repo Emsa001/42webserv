@@ -23,13 +23,10 @@ int main()
     Config& config = Config::instance();
     config.parse("conf/default.yml");
 
-
-
     config_array servers = config.getServers();
     config_map server1 = servers[0].getMap();
-    std::string host = Config::getSafe(server1, "host", ConfigValue((std::string)"127.0.0.1")).getString();
-    std::cout << "Starting server on " << host << std::endl;
-
+    // std::string host = Config::getSafe(server1, "host", ConfigValue((std::string)"127.0.0.1")).getString();
+    // std::cout << "Starting server on " << host << std::endl;
 
     // config_array::iterator it = servers.begin();
 
