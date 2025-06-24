@@ -1,48 +1,33 @@
 #include "Webserv.hpp"
 
-volatile sig_atomic_t g_stop = 0;
-pthread_mutex_t Logger::logMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t g_stop_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-void* startServer(void* arg) {
-    config_map* data = static_cast<config_map*>(arg);
-    Server server(*data);
-    std::cout << std::endl;
-    server.start();
-    std::cout << std::endl;
-    return NULL;
-}
-
 int main()
 {
-    signal(SIGINT, signalHandler);
-    std::cout << std::endl << std::endl << std::endl;
+	Config &config = Config::instance();
+	config.parse("conf/default.yml");
+	Server server(config.getServers()[0].getMap());
 
-    // Logger::init();
+	for(int i = 1; i <= 5; i++){
+		std::string path = (i > 1 ? "/" + intToString(i) : "/");
 
-    Config& config = Config::instance();
-    config.parse("conf/default.yml");
+		std::string requestStr =
+			"GET " + path + " HTTP/1.1\r\n"
+			"Host: MainServer\r\n"
+			"Connection: close\r\n\r\n";
+	
+		HttpRequest request(requestStr, server.getConfig());
+		HttpResponse response = server.handleResponse(&request);
 
-    config_array servers = config.getServers();
-    config_map server1 = servers[0].getMap();
-    // std::string host = Config::getSafe(server1, "host", ConfigValue((std::string)"127.0.0.1")).getString();
-    // std::cout << "Starting server on " << host << std::endl;
+		const FileData fileData = response.getFileData();
+		const config_map *locationData = response.getLocationData();
+		std::string index = Config::getSafe(*locationData, "index", ConfigValue("index.html")).getString();
 
-    // config_array::iterator it = servers.begin();
+		std::cout << "Path: " << path << std::endl;
+		std::cout << "name: " << fileData.path << std::endl;
+		std::cout << "index: " << index << std::endl;
+	
+		// EXPECT_EQ(response.getStatusCode(), 200);
+		// EXPECT_TRUE(response.getFileData().name == "index.html");
+	}
 
-    // std::vector<pthread_t> threads;
-
-    // for(; it != servers.end(); it++){
-    //     pthread_t thread;
-    //     pthread_create(&thread, NULL, startServer, &it->getMap());
-    //     threads.push_back(thread);
-    // }
-
-    // for(size_t i = 0; i < threads.size(); i++) {
-    //     pthread_join(threads[i], NULL);
-    // }
-
-    Logger::destroy();
-
-    return 0;
+	return 0;
 }

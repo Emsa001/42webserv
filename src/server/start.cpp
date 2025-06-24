@@ -1,33 +1,58 @@
 #include "Webserv.hpp"
+#include <netdb.h>
 
-int Server::start() {
-    int server_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_sock < 0) {
-        std::cerr << "Failed to create socket" << std::endl;
-        return 1;
-    }
+// int Server::start()
+// {
+//     struct addrinfo hints, *res;
+//     int status;
+
+//     memset(&hints, 0, sizeof hints);
+//     hints.ai_family = AF_INET;       // IPv4
+//     hints.ai_socktype = SOCK_STREAM; // TCP
+//     hints.ai_flags = AI_PASSIVE;     // Use my IP
+
+//     std::string host = Config::getSafe(*this->config, "host", ConfigValue((std::string) "127.0.0.1")).getString();
+//     const std::string &port = this->config->at("listen");
+
+//     if ((status = getaddrinfo(host.c_str(), port.c_str(), &hints, &res)) != 0)
+//     {
+//         std::cerr << "getaddrinfo: " << gai_strerror(status) << std::endl;
+//         throw std::runtime_error("Failed to create socket");
+        
+//     }
+
+//     struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
     
-    // allow reusing the same port after the server has been stopped
-    int opt = 1;
-    setsockopt(server_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    
-    const int port = this->config->at("listen");
-    sockaddr_in server_addr;                        // → Structure to store the server’s IP address and port.
-    memset(&server_addr, 0, sizeof(server_addr));   // → Clear the structure.
-    server_addr.sin_family = AF_INET;               // → Set the address family to AF_INET (IPv4).
-    server_addr.sin_addr.s_addr = INADDR_ANY;       // → Set the IP address to INADDR_ANY (all available interfaces).
-    server_addr.sin_port = htons(port);             // → Set the port number.
+//     newfd.events = POLLIN;
+//     newfd.revents = 0;
+//     newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
-    // std::cout << "Host order: " << std::hex << port << std::endl;
-    // std::cout << "Network order: " << std::hex << server_addr.sin_port << std::endl;
-    
-    if (bind(server_sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        std::cerr << "Bind failed" << std::endl;
-        return 1;
-    }
+//     if (newfd.fd < 0)
+//     {
+//         std::cerr << "Failed to create socket" << std::endl;
+//         freeaddrinfo(res);
+//         throw std::runtime_error("Failed to create socket");
+//     }
 
-    this->listener(server_sock);
+//     int opt = 1;
+//     setsockopt(newfd.fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    close(server_sock);
-    return 0;
-}
+//     if (bind(newfd.fd, res->ai_addr, res->ai_addrlen) < 0)
+//     {
+//         std::cerr << "Bind failed" << std::endl;
+//         freeaddrinfo(res);
+//         close(newfd.fd);
+//         throw std::runtime_error("Failed to create socket");
+        
+//     }
+
+//     this->setNonBlocking(newfd.fd);
+//     listen(newfd.fd, MAX_CLIENTS);
+
+//     this->listener(newfd.fd);
+
+//     // cleaning
+//     freeaddrinfo(res);
+//     close(newfd.fd);
+//     return 0;
+// }

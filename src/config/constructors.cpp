@@ -14,18 +14,18 @@ void ConfigParser::init(){
 ConfigParser::ConfigParser()
 {
     this->init();
-    std::cout << "Config is created" << std::endl;
+    // std::cout << "Config is created" << std::endl;
     this->file.open("conf/default.yml");
 }
 
 ConfigParser::ConfigParser(std::string const &filename)
 {
     this->init();
-    std::cout << "Config is created" << std::endl;
+    // std::cout << "Config is created" << std::endl;
     this->file.open(filename.c_str());
 }
 
 ConfigParser::~ConfigParser()
 {
-    std::cout << "Config destructor called, resources freed successfully." << std::endl;
+    // std::cout << "Config destructor called, resources freed successfully." << std::endl;
 }

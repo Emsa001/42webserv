@@ -4,50 +4,54 @@
 #include "Webserv.hpp"
 
 class HttpRequest;
+class HttpResponse;
 struct ClientRequestState;
 
-class Server {
-    private:
-       
-        config_map *config;
-        int keep_alive;
+class Server
+{
+private:
+    config_map config;
 
-        std::vector<pollfd> fds;
-        std::map<int, time_t> client_timestamps;
-        std::map<int, ClientRequestState> requestStates;
+    // TODO: Move this to SocketHandler
+    std::vector<pollfd> fds;
+    std::map<int, time_t> client_timestamps;
+    std::map<int, ClientRequestState> requestStates;
 
-        void listener(int server_sock);
-        void setNonBlocking(int sock);
-        void acceptNewConnections(int server_sock);
-        void handleClientRead(size_t index);
-        void checkIdleClients();
-        void removeClient(size_t index);
+    // TODO: Move this to SocketHandler
+    void listener(int server_sock);
+    void setNonBlocking(int sock);
+    void acceptNewConnections(int server_sock);
+    void handleClientRead(size_t index);
+    void checkIdleClients();
+    void removeClient(size_t index);
 
-        bool handleResponse(int client_sock, HttpRequest *request);
+    // TODO: Move this to SocketHandler
+    ClientRequestState *readChunk(int fd, int index, char *buffer);
+    int readBytes(int fd, int index, char *buffer);
 
-        void isValidMethod(HttpRequest *request, const config_map &location);
-        const FileData createFileData(const config_map *location, HttpRequest *request) const;
+    // Helper methods
+    void isValidMethod(HttpRequest *request, const config_map &location);
+    const FileData createFileData(const config_map *location, HttpRequest *request) const;
 
-        ClientRequestState *readChunk(int fd, int index, char *buffer);
-        int readBytes(int fd, int index, char *buffer);
-    public:
-        Server(config_map &config) : config(&config) {
-            this->keep_alive = Config::getSafe(config, "keep_alive", 30).getInt();;
-        }
-        ~Server() {}
+public:
+    Server(const config_map &config) : config(config)
+    {
+        // TODO: Handle this in SocketHandler
+        // this->keep_alive = Config::getSafe(config, "keep_alive", 30).getInt();;
+    }
+    ~Server() {}
 
-        int start();
-        bool isStop();
+    const config_map *findLocation(const std::string &path);
+    // TODO: Move this to SocketHandler
+    void closeConnection(int *client_sock);
 
-        bool isDirectoryListing(const config_map *location, const FileData &fileData);
-        const config_map *findLocation(const std::string &path);
-        void closeConnection(int *client_sock);
+    // Startpoint for the server
+    HttpResponse handleResponse(HttpRequest *request);
 
-        std::string const getServerName() const {
-            return this->config->at("server_name");
-        }
+    // Getters
 
+    std::string const getServerName() const { return this->config.at("server_name"); }
+    config_map const &getConfig() const { return this->config; }
 };
-
 
 #endif

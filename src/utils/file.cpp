@@ -42,7 +42,6 @@ FileData getFileData(const std::string &path) {
     fileData.path = path;
     fileData.name = path.substr(path.find_last_of("/") + 1);
     fileData.exists = fileExists(path);
-    fileData.size = 0;
 
     if (!fileData.exists) {
         fileData.isDirectory = false;

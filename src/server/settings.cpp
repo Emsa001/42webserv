@@ -8,9 +8,12 @@
     - In non-blocking mode, the program continues running even if there’s no incoming connection or data.
 */
 
+// TODO: Move this to SocketHandler
+
 #ifndef TCP_KEEPIDLE
     #define TCP_KEEPIDLE 4
 #endif
+
 
 void Server::setNonBlocking(int sock) {
     int flags = fcntl(sock, F_GETFL, 0);

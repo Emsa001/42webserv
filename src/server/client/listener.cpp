@@ -1,14 +1,14 @@
 #include "Webserv.hpp"
 
-bool Server::isStop(){
-    pthread_mutex_lock(&g_stop_mutex);
-    if (g_stop) {
-        pthread_mutex_unlock(&g_stop_mutex);
-        return true;
-    }
-    pthread_mutex_unlock(&g_stop_mutex);
-    return false;
-}
+// bool Server::isStop(){
+//     pthread_mutex_lock(&g_stop_mutex);
+//     if (g_stop) {
+//         pthread_mutex_unlock(&g_stop_mutex);
+//         return true;
+//     }
+//     pthread_mutex_unlock(&g_stop_mutex);
+//     return false;
+// }
 
 void Server::listener(int server_sock) {
     listen(server_sock, MAX_CLIENTS);
@@ -22,26 +22,26 @@ void Server::listener(int server_sock) {
     fds.push_back(fd);
     const int timeout_ms = 1000;
 
-    Logger::success("Server: " + this->getServerName() + " started");
+    Logger::success("Server: " + this->getServerName() + " started listening on port " + this->config.at("listen").getString());
 
-    while (!this->isStop()) {
+    // while (!this->isStop()) {
 
-        int ret = poll(fds.data(), fds.size(), timeout_ms);
-        if (ret < 0) {
-            perror("poll");
-            break;
-        }
+    //     int ret = poll(fds.data(), fds.size(), timeout_ms);
+    //     if (ret < 0) {
+    //         perror("poll");
+    //         break;
+    //     }
 
-        for (size_t i = 0; i < fds.size(); ++i) {
-            if (fds[i].fd == server_sock && (fds[i].revents & POLLIN)) {
-                this->acceptNewConnections(server_sock);
-            } else if (fds[i].revents & POLLIN) {
-                this->handleClientRead(i);
-            }
-        }
+    //     for (size_t i = 0; i < fds.size(); ++i) {
+    //         if (fds[i].fd == server_sock && (fds[i].revents & POLLIN)) {
+    //             this->acceptNewConnections(server_sock);
+    //         } else if (fds[i].revents & POLLIN) {
+    //             this->handleClientRead(i);
+    //         }
+    //     }
 
-        this->checkIdleClients();
-    }
+    //     this->checkIdleClients();
+    // }
 
-    Logger::warning("Server: " + this->getServerName() + " stopped");
+    // Logger::warning("Server: " + this->getServerName() + " stopped");
 }

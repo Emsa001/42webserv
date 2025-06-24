@@ -22,6 +22,26 @@ server0:
         path: "/"
         root: "/mainserver/"
         methods: "GET"
+    location:
+        path: "/2"
+        index: "index2.html"
+        root: "/mainserver/"
+        methods: "GET"
+    location:
+        path: "/3"
+        index: "index3.html"
+        root: "/mainserver/"
+        methods: "GET"
+    location:
+        path: "/4"
+        index: "index4.html"
+        root: "/mainserver/"
+        methods: "GET"
+    location:
+        path: "/5"
+        index: "index5.html"
+        root: "/mainserver/"
+        methods: "GET"
 
 server1:
     server_name: "MyServer1"

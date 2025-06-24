@@ -1,8 +1,8 @@
 #include "HttpResponse.hpp"
 
-void HttpResponse::setSettings(const config_map *location){
-    if(Config::getSafe(*location, "autoindex", false))
+void HttpResponse::setSettings(){
+    if(Config::getSafe(*this->getLocationData(), "autoindex", false))
         this->listing = true;
-    if(Config::getSafe(*location, "cgi", false))
+    if(Config::getSafe(*this->getLocationData(), "cgi", false))
         this->cgi = true;
 }

@@ -9,7 +9,7 @@ void HttpResponse::log() {
 
     Config config = Config::instance();
     std::string logFormat = Config::getSafe(config.getRoot(), "log_format", (std::string)DEFAULT_LOG_FORMAT).getString();
-    std::string serverName = Config::getSafe(*(this->config), "server_name", "webserv").getString();
+    std::string serverName = Config::getSafe(this->config, "server_name", "webserv").getString();
 
     std::string date = getDate();
     std::string time = getTime();

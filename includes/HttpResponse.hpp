@@ -4,66 +4,124 @@
 #include "Webserv.hpp"
 #include "HttpRequest.hpp"
 
-class HttpRequest;
-class HttpRequest;
-
+/**
+ * @brief Represents an HTTP response to be sent to the client.
+ */
 class HttpResponse {
     private:
-        HttpRequest *request; // Pointer to the request object
+        HttpRequest *request;            ///< Pointer to the associated request object
+        config_map config;               ///< Server or location configuration
 
-        std::string statusLine;  // Stores "HTTP/1.1 200 OK"
-        StringMap headers;      // Stores key-value pairs like "Content-Type: text/html"
-        std::string body;        // Stores the response body (usually html)
+        FileData fileData;               ///< File data that was used to build the response (saved for debugging and testing)
+        const config_map *locationData;   ///< Location-specific configuration data (saved for debugging and testing)
+        
+        std::string statusLine;          ///< Stores "HTTP/1.1 200 OK"
+        StringMap headers;               ///< Key-value pairs like "Content-Type: text/html"
+        std::string body;                ///< Response body (usually HTML)
+        std::string response;            ///< Entire response to be sent to the client
+        
+        bool listing;                    ///< True if body is a directory listing
+        bool cgi;                        ///< True if body is CGI script output
+        unsigned short statusCode;       ///< HTTP status code (e.g., 200)
+        
 
-        bool listing;           // If true, the body will be a directory listing
-        bool cgi;               // If true, the body will be the output of a CGI script
+        // --- Private helper methods ---
 
-        std::string response;    // Stores the entire response to be sent to the client
-
-        unsigned short statusCode;
-        int socket;
-        config_map *config;
-    
+        /**
+         * @brief Returns the default status page HTML for error responses.
+         * @return Default status page HTML as a string
+         */
         std::string const getDefaultStatusPage();
 
-    public:
-        HttpResponse(int socket, HttpRequest *request, config_map *config) : request(request), socket(socket), config(config) {
-            statusLine = "HTTP/1.1 200 OK";
-            listing = false;
-            statusCode = 200;
-            body = "";
-            cgi = false;
-        };
-        ~HttpResponse() {};
-
-
-        // Methods
-        void respond();
-        void build();
-        void log();
-        
+        /**
+         * @brief Returns the reason phrase for a given HTTP status code.
+         * @param code HTTP status code
+         */
         std::string getReasonPhrase(unsigned short code);
+
+        /**
+         * @brief Returns the MIME type for a given file path.
+         * @param path File path
+         */
         static std::string getMimeType(const std::string &path);
-        
+
+    public:
+        // --- Constructor & Destructor ---
+
+        /**
+         * @brief Constructs an HttpResponse object.
+         * @param request Pointer to the associated HttpRequest
+         * @param config Reference to the configuration map
+         */
+        HttpResponse(HttpRequest *request, config_map &config)
+            : request(request), config(config), statusLine("HTTP/1.1 200 OK"),
+              listing(false), cgi(false), statusCode(200), body("") {}
+
+        ~HttpResponse() {}
+
+        // --- Core response methods ---
+
+        /**
+         * @brief Builds full HTTP response string (ready to send).
+         */
+        void build();
+
+        /**
+         * @brief Logs the response (for debugging or access logs).
+         */
+        void log();
+
+        /**
+         * @brief Generates a directory listing as the response body.
+         * @param fileData Information about the directory to list
+         */
         void directoryListing(const FileData &fileData);
+
+        /**
+         * @brief Sets the response to a default status page for the given code.
+         * @param code HTTP status code
+         */
         void respondStatusPage(unsigned short code);
 
+        /**
+         * @brief Builds the response body from file data and request.
+         * @param fileData File data to serve
+         * @param request Pointer to the associated HttpRequest
+         */
         void buildBody(FileData &fileData, const HttpRequest *request);
+
+        // --- Setters ---
+
         void setBody(const std::string &body) { this->body = body; }
+        void setResponse(const std::string &response) { this->response = response; }
+        void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
+        void setSettings();
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);
         }
+        void setFileData(FileData &fileData) { this->fileData = fileData;}
+        void setLocationData(const config_map *locationData) { this->locationData = locationData; }
+        
+        // --- Getters ---
 
-        // Setters
- 
-        void setResponse(const std::string &response) { this->response = response; }
-        void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
-        void setSettings(const config_map *location);
-
-        // Getters
-
+        HttpRequest *getRequest() const { return request; }
+        
+        std::string getBody() const { return body; }
+        std::string getResponse() const { return response; }
+        std::string getStatusLine() const { return statusLine; }
+    
+        unsigned short getStatusCode() const { return statusCode; }
+        bool isCgi() const { return cgi; }
+        bool isListing() const { return listing; }
+        
         StringMap getHeaders() const { return headers; }
+        std::string getHeader(const std::string &key) const {
+            StringMap::const_iterator it = headers.find(key);
+            return (it != headers.end()) ? it->second : "";
+        }
+        const FileData getFileData() const { return fileData; }
+        const config_map *getLocationData() const { return locationData; }
 };
 
 #endif

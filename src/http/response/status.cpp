@@ -108,7 +108,7 @@ void HttpResponse::respondStatusPage(unsigned short code) {
     std::string errorMessage = this->getReasonPhrase(code);
     
     // ConfigValue *errors = &(this->config->at("errors"));
-    config_map errors = Config::getSafe(*this->config, "errors", ConfigValue()).getMap();
+    config_map errors = Config::getSafe(this->config, "errors", ConfigValue()).getMap();
     std::string errorPage = Config::getSafe(errors, intToString(code), "").getString();
     
     this->setStatusCode(code);
@@ -122,6 +122,6 @@ void HttpResponse::respondStatusPage(unsigned short code) {
     this->setHeader("Content-Length", intToString(this->body.size()));
 
     this->build();
-    this->respond();
+    // this->respond();
 }
 

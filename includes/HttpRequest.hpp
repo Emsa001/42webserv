@@ -66,11 +66,13 @@ class HttpRequest {
         size_t maxHeaderSize;
         size_t maxBodySize;
 
-        int socket;
         std::string rawRequestData;
 
     public:
-        HttpRequest(int socket, const std::string &rawData) : url(NULL), socket(socket), rawRequestData(rawData) { }
+        HttpRequest(const std::string &rawData, const config_map &config) : url(NULL), rawRequestData(rawData) { 
+            this->setMaxHeaderSize(Config::getSafe(config, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt());
+            this->setMaxBodySize(Config::getSafe(config, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt());
+        }
 
         ~HttpRequest() {
             delete url;
@@ -102,7 +104,9 @@ class HttpRequest {
             return "";
         }
 
-        int getSocket() const { return this->socket; }
+        size_t getMaxHeaderSize() const { return this->maxHeaderSize; }
+        size_t getMaxBodySize() const { return this->maxBodySize; }
+
 };
 
 

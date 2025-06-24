@@ -11,7 +11,7 @@
 
 const config_map* Server::findLocation(const std::string &path) {
 
-    const config_array& locations = this->config->at("locations").getArray();
+    const config_array& locations = this->config.at("locations").getArray();
     StringVec pathSegments = split(trimChar(path, '/'), '/');
     const config_map* match = NULL;
 
@@ -42,7 +42,7 @@ const config_map* Server::findLocation(const std::string &path) {
 // First match approach
 
 // const config_map* Server::findLocation(const std::string &path) {
-//     const config_array& locations = this->config->at("locations").getArray();
+//     const config_array& locations = this->config.at("locations").getArray();
 //     StringVec pathSegments = split(removeTrailingSlash(path), '/');
 
 //     for (config_array::const_iterator it = locations.begin(); it != locations.end(); ++it) {

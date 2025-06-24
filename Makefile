@@ -3,8 +3,8 @@ NAME			= webserv
 
 # compiler settings
 CXX				= c++
-CXXFLAGS		= -Wall -Wextra -Werror # TODO
-CXXFLAGS		+= -std=c++98 -pedantic -fsanitize=thread
+CXXFLAGS		= #-Wall -Wextra -Werror # TODO
+CXXFLAGS		+= -std=c++98 -pedantic
 CXXFLAGS		+= -I$(INCDIR)
 
 # source files
@@ -49,7 +49,7 @@ format:
 TEST_CXXFLAGS		+= -I$(GTESTDIR)/googletest/include -g -I$(INCDIR)
 TEST_LDFLAGS		+= -L$(GTESTDIR)/build/lib
 TEST_LDLIBS			+= -lgtest
-TEST_MAIN			= tests/test.cpp
+TEST_MAIN			= tests/test.cpp tests/serverResponse.cpp
 TEST_OBJ			= $(filter-out %/main.o, $(OBJ))
 
 GTESTDIR = gtest

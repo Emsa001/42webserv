@@ -1,4 +1,21 @@
 #include "Webserv.hpp"
+#include <cstring> // for strlen
+
+// --- Add these helper functions at the top or in an anonymous namespace ---
+
+// Simple header validation: checks for a valid HTTP request line
+static bool validateHeaders(const std::string& headers) {
+    size_t firstLineEnd = headers.find("\r\n");
+    if (firstLineEnd == std::string::npos) return false;
+    std::string requestLine = headers.substr(0, firstLineEnd);
+    // Basic check: METHOD SP URI SP HTTP/VERSION
+    size_t methodEnd = requestLine.find(' ');
+    if (methodEnd == std::string::npos) return false;
+    size_t uriEnd = requestLine.find(' ', methodEnd + 1);
+    if (uriEnd == std::string::npos) return false;
+    if (requestLine.find("HTTP/") == std::string::npos) return false;
+    return true;
+}
 
 int Server::readBytes(int fd, int index, char *buffer){
     const int bytes_read = recv(fd, buffer, sizeof(buffer), 0);
@@ -15,7 +32,6 @@ int Server::readBytes(int fd, int index, char *buffer){
     return bytes_read;
 }
 
-// This is a bit ugly, but Im too lazy to refactor it
 ClientRequestState *Server::readChunk(int fd, int index, char *buffer) {
     int bytes_read = this->readBytes(fd, index, buffer);
     if (bytes_read <= 0) return NULL;
@@ -26,16 +42,34 @@ ClientRequestState *Server::readChunk(int fd, int index, char *buffer) {
     // Optional: prevent abuse with a hard limit for a chunk
     if (state.buffer.size() > HARD_BUFFER_LIMIT) {
         Logger::warning("Request exceeded hard buffer limit on fd " + intToString(fd));
+        
+        HttpRequest dummyRequest(state.buffer, this->config);
+        HttpResponse response(&dummyRequest, this->config);
+        response.respondStatusPage(400);
+
         this->removeClient(index);
         return NULL;
     }
 
     size_t headerEnd = state.buffer.find("\r\n\r\n");
     if (headerEnd != std::string::npos && !state.headersParsed) {
+        std::string headers = state.buffer.substr(0, headerEnd);
+
+        // Validate headers before proceeding
+        if (!validateHeaders(headers)) {
+            Logger::warning("Malformed HTTP headers on fd " + intToString(fd));
+            
+            HttpRequest dummyRequest(state.buffer, this->config);
+            HttpResponse response(&dummyRequest, this->config);
+            response.respondStatusPage(400);
+
+            this->removeClient(index);
+            return NULL;
+        }
+
         state.headersParsed = true;
 
         // Soft parse just Content-Length to know when to stop reading
-        std::string headers = state.buffer.substr(0, headerEnd);
         size_t clPos = headers.find("Content-Length:");
 
         if (clPos != std::string::npos) {
@@ -61,6 +95,7 @@ ClientRequestState *Server::readChunk(int fd, int index, char *buffer) {
 }
 
 
+// TODO: This part will be dont by SocketHandler, Server functionality will be limited to handleRespose method
 void Server::handleClientRead(size_t index) {
     int fd = this->fds[index].fd;
     char buffer[READ_BUFFER_SIZE];
@@ -72,12 +107,11 @@ void Server::handleClientRead(size_t index) {
         size_t totalRequired = state->buffer.find("\r\n\r\n") + 4 + state->contentLength;
 
         if (state->buffer.size() >= totalRequired) {
-            HttpRequest request(fd, state->buffer);
+            HttpRequest request(state->buffer, this->config);
+            request.parse();
+            HttpResponse response = this->handleResponse(&request);
 
-            request.setMaxHeaderSize(Config::getSafe(*this->config, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE));
-            request.setMaxBodySize(Config::getSafe(*this->config, "max_client_body_size", DEFAULT_MAX_BODY_SIZE));
-
-            if (!this->handleResponse(fd, &request)) {
+            if (response.getHeader("Connection") == "close") {
                 this->removeClient(index);
             }
 
@@ -85,3 +119,4 @@ void Server::handleClientRead(size_t index) {
         }
     }
 }
+
