@@ -31,11 +31,11 @@ re: fclean
 	$(MAKE)
 
 $(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o "$@" $?
+	$(CXX) $(CXXFLAGS) -o "$@" $^ $(LDFLAGS)
 
 $(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o "$@" "$<"
+	$(CXX) $(CXXFLAGS) -c -o "$@" "$<"
 
 setup:
 	docker build -t pre-commit -f assets/pre-commit.Dockerfile . 

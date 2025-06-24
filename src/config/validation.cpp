@@ -24,10 +24,13 @@ bool ConfigSchema::validate(const std::string &key, ValueType type, int blockKin
     }
 
     /*
-        TODO: Conditional jump or move depends on uninitialised value(s)
+        Check if allowAll is set and matches the key/value types
     */
     ValueType keyType = ConfigValue::detectType(key, false).getType();
-    if(validSchema->allowAllKey == keyType && validSchema->allowAllValue == type){
+    if(validSchema->allowAllKey != static_cast<ValueType>(-1) && 
+       validSchema->allowAllValue != static_cast<ValueType>(-1) &&
+       validSchema->allowAllKey == keyType && 
+       validSchema->allowAllValue == type){
         return true;
     }
 

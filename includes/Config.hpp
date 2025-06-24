@@ -103,7 +103,7 @@ class ConfigSchema {
         NestedSchemaMap nestedSchemas;
 
     public:
-        ConfigSchema() {};
+        ConfigSchema() : allowAllKey(static_cast<ValueType>(-1)), allowAllValue(static_cast<ValueType>(-1)) {};
         ~ConfigSchema() {};
 
         void addEntry(const std::string &key, ValueType type, bool required);
