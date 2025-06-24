@@ -3,11 +3,12 @@
 
 #include "Webserv.hpp"
 #include "HttpRequest.hpp"
+#include "HttpMessage.hpp"
 
 /**
  * @brief Represents an HTTP response to be sent to the client.
  */
-class HttpResponse {
+class HttpResponse : public HttpMessage {
     private:
         HttpRequest *request;            ///< Pointer to the associated request object
         config_map config;               ///< Server or location configuration
@@ -16,8 +17,6 @@ class HttpResponse {
         const config_map *locationData;   ///< Location-specific configuration data (saved for debugging and testing)
         
         std::string statusLine;          ///< Stores "HTTP/1.1 200 OK"
-        StringMap headers;               ///< Key-value pairs like "Content-Type: text/html"
-        std::string body;                ///< Response body (usually HTML)
         std::string response;            ///< Entire response to be sent to the client
         
         bool listing;                    ///< True if body is a directory listing
@@ -33,16 +32,7 @@ class HttpResponse {
          */
         std::string const getDefaultStatusPage();
 
-        /**
-         * @brief Returns the reason phrase for a given HTTP status code.
-         * @param code HTTP status code
-         */
         std::string getReasonPhrase(unsigned short code);
-
-        /**
-         * @brief Returns the MIME type for a given file path.
-         * @param path File path
-         */
         static std::string getMimeType(const std::string &path);
 
     public:
@@ -55,7 +45,7 @@ class HttpResponse {
          */
         HttpResponse(HttpRequest *request, config_map &config)
             : request(request), config(config), statusLine("HTTP/1.1 200 OK"),
-              listing(false), cgi(false), statusCode(200), body("") {}
+              listing(false), cgi(false), statusCode(200) {}
 
         ~HttpResponse() {}
 
@@ -78,23 +68,15 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
 
         /**
-         * @brief Sets the response to a default status page for the given code.
+         * @brief Sets the response to a status page for the given code. 
          * @param code HTTP status code
          */
         void respondStatusPage(unsigned short code);
-
-        /**
-         * @brief Builds the response body from file data and request.
-         * @param fileData File data to serve
-         * @param request Pointer to the associated HttpRequest
-         */
         void buildBody(FileData &fileData, const HttpRequest *request);
 
         // --- Setters ---
 
-        void setBody(const std::string &body) { this->body = body; }
         void setResponse(const std::string &response) { this->response = response; }
-        void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
         void setSettings();
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
@@ -107,7 +89,6 @@ class HttpResponse {
 
         HttpRequest *getRequest() const { return request; }
         
-        std::string getBody() const { return body; }
         std::string getResponse() const { return response; }
         std::string getStatusLine() const { return statusLine; }
     
@@ -115,11 +96,6 @@ class HttpResponse {
         bool isCgi() const { return cgi; }
         bool isListing() const { return listing; }
         
-        StringMap getHeaders() const { return headers; }
-        std::string getHeader(const std::string &key) const {
-            StringMap::const_iterator it = headers.find(key);
-            return (it != headers.end()) ? it->second : "";
-        }
         const FileData getFileData() const { return fileData; }
         const config_map *getLocationData() const { return locationData; }
 };
