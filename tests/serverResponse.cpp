@@ -4,6 +4,8 @@
 /** 
  * 
  * Webserv server's response handling tests.
+ * All Requests are assumed to be valid. HttpResponse works only with already fully checked HttpRequest objects.
+ * Request is parsed in server.handleResponse() method.
  * 
  * The tests cover:
  * - Basic GET request to the root of the main server
@@ -11,6 +13,7 @@
  * - Autoindexing of a public directory
  * - Execution of CGI scripts
  * - Handling of request bodies that exceed size limits (413 Payload Too Large)
+ * - Handling of request headers that exceed size limits (431 Request Header Fields Too Large)
  * - Method not allowed responses (405 Method Not Allowed)
  * - Index location handling for different paths
  * 
@@ -74,7 +77,7 @@ TEST(WebservTests, AutoindexPublicDirectory)
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isListing());
-	EXPECT_TRUE(response.getBody().find("Index of") != std::string::npos); // assuming autoindex is HTML
+	EXPECT_TRUE(response.getBody().find("Index of") != std::string::npos);
 }
 
 TEST(WebservTests, CgiScriptExecution)
@@ -116,6 +119,24 @@ TEST(WebservTests, RequestBodyTooLarge)
 
 	HttpResponse response = server.handleResponse(&request);
 	EXPECT_EQ(response.getStatusCode(), 413); // 413 Payload Too Large
+}
+
+TEST(WebservTests, RequestHeaderTooLarge)
+{
+	Config &config = Config::instance();
+	config.parse("conf/default.yml");
+	Server server(config.getServers()[0].getMap()); // MainServer
+
+	// Create a header that exceeds 1024 bytes
+	std::string largeHeader = "GET / HTTP/1.1\r\nHost: MainServer\r\n";
+	while (largeHeader.size() < 1100)
+		largeHeader += "X-Dummy-Header: value\r\n";
+	largeHeader += "\r\n";
+
+	HttpRequest request(largeHeader, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
+
+	EXPECT_EQ(response.getStatusCode(), 431); // 431 Request Header Fields Too Large
 }
 
 TEST(WebservTests, MethodNotAllowed)
