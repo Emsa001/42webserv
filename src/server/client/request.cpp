@@ -1,7 +1,4 @@
 #include "Webserv.hpp"
-#include <cstring> // for strlen
-
-// --- Add these helper functions at the top or in an anonymous namespace ---
 
 // Simple header validation: checks for a valid HTTP request line
 static bool validateHeaders(const std::string& headers) {

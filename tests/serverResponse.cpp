@@ -1,6 +1,22 @@
 #include <gtest/gtest.h>
 #include <Webserv.hpp>
 
+/** 
+ * 
+ * Webserv server's response handling tests.
+ * 
+ * The tests cover:
+ * - Basic GET request to the root of the main server
+ * - Handling of unknown paths (404 Not Found)
+ * - Autoindexing of a public directory
+ * - Execution of CGI scripts
+ * - Handling of request bodies that exceed size limits (413 Payload Too Large)
+ * - Method not allowed responses (405 Method Not Allowed)
+ * - Index location handling for different paths
+ * 
+
+*/
+
 TEST(WebservTests, BasicGetRootMainServer)
 {
 	Config &config = Config::instance();
@@ -121,7 +137,7 @@ TEST(WebservTests, MethodNotAllowed)
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
 
-TEST(WebservTests, IndexHtmlServed)
+TEST(WebservTests, IndexLocation)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
