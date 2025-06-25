@@ -5,6 +5,7 @@ import cgi
 import cgitb
 import json
 import sys
+import urllib.parse
 
 # Set up absolute upload directory path
 UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../uploads"))
@@ -35,8 +36,10 @@ def save_file(form):
     else:
         return {"status": "fail", "error": "No file selected"}
 
-def delete_file(form):
-    filename = form.getvalue("filename")
+def delete_file():
+    query = os.environ.get("QUERY_STRING", "")
+    params = urllib.parse.parse_qs(query)
+    filename = params.get("filename", [None])[0]
     if not filename:
         return {"status": "fail", "error": "No filename specified"}
 
@@ -50,23 +53,40 @@ def delete_file(form):
     else:
         return {"status": "fail", "error": "File not found"}
 
+def save_binary():
+    content_length = int(os.environ.get("CONTENT_LENGTH", 0))
+    if content_length == 0:
+        return {"status": "fail", "error": "No data received"}
+    try:
+        binary_data = sys.stdin.buffer.read(content_length)
+        filename = "upload.bin"
+        filepath = os.path.join(UPLOAD_DIR, filename)
+        with open(filepath, "wb") as f:
+            f.write(binary_data)
+        return {"status": "success", "filename": filename, "size": len(binary_data)}
+    except Exception as e:
+        return {"status": "fail", "error": str(e)}
+
 def main():
     print("Content-Type: application/json\n")
 
-    form = cgi.FieldStorage()
     method = os.environ.get("REQUEST_METHOD")
+    content_type = os.environ.get("CONTENT_TYPE", "")
 
     if method == "POST":
-        response = save_file(form)
+        if content_type.startswith("application/octet-stream"):
+            response = save_binary()
+        else:
+            form = cgi.FieldStorage()
+            response = save_file(form)
     elif method == "GET":
         response = list_files()
     elif method == "DELETE":
-        response = delete_file(form)
+        response = delete_file()
     else:
         response = {"status": "fail", "error": "Invalid request method"}
 
     print(json.dumps(response))
-
 
 if __name__ == "__main__":
     main()

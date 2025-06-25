@@ -1,5 +1,7 @@
 #include "HttpRequest.hpp"
 
+std::string normalizeUri(const std::string &uri);
+
 /**
  * @brief Parses the raw HTTP request data and populates the HttpRequest object.
  *
@@ -48,7 +50,8 @@ void HttpRequest::parse() {
 
     std::istringstream lineStream(line);
     lineStream >> this->method >> this->uri >> this->version;
-    this->url = new HttpURL(this->uri);
+
+    this->url = new HttpURL(normalizeUri(this->uri));
 
     // 4. Iterate through each header line, extracting key-value pairs and trimming whitespace
     while (std::getline(headerStream, line) && line != "\r") {
@@ -79,5 +82,27 @@ void HttpRequest::parse() {
         if (this->body.size() > this->maxBodySize) {
             throw HttpRequestException(413);
         }
+        if(this->body.size() > 0 && this->headers.find("Content-Length") == this->headers.end()) {
+            throw HttpRequestException(400); // Content-Length header is required for POST/DELETE with body
+        }
+        else if (this->headers.find("Content-Length") != this->headers.end()) {
+            int contentLength = stringToInt(this->headers["Content-Length"]);
+            if (contentLength != this->body.size()) {
+                throw HttpRequestException(400); // Content-Length mismatch
+            }
+        }
     }
+}
+
+
+std::string normalizeUri(const std::string &uri) {
+    // Normalize the URI by removing duplicate slashes and ensuring it starts with a single slash
+    std::string normalized = uri;
+    while (normalized.find("//") != std::string::npos) {
+        normalized.replace(normalized.find("//"), 2, "/");
+    }
+    if (normalized.empty() || normalized[0] != '/') {
+        normalized = "/" + normalized;
+    }
+    return normalized;
 }

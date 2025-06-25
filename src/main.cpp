@@ -6,28 +6,19 @@ int main()
 	config.parse("conf/default.yml");
 	Server server(config.getServers()[0].getMap());
 
-	for(int i = 1; i <= 5; i++){
-		std::string path = (i > 1 ? "/" + intToString(i) : "/");
+	HttpRequest request(
+		"GET // HTTP/1.1\r\n"
+		"Host: MainServer\r\n"
+		"Connection: close\r\n\r\n",
+		server.getConfig()
+	);
 
-		std::string requestStr =
-			"GET " + path + " HTTP/1.1\r\n"
-			"Host: MainServer\r\n"
-			"Connection: close\r\n\r\n";
-	
-		HttpRequest request(requestStr, server.getConfig());
-		HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request);
+	std::cout << "Request Method: " << request.getMethod() << std::endl;
+	std::cout << "Request URL: " << request.getURL()->getPath() << std::endl;
 
-		const FileData fileData = response.getFileData();
-		const config_map *locationData = response.getLocationData();
-		std::string index = Config::getSafe(*locationData, "index", ConfigValue("index.html")).getString();
-
-		std::cout << "Path: " << path << std::endl;
-		std::cout << "name: " << fileData.path << std::endl;
-		std::cout << "index: " << index << std::endl;
-	
-		// EXPECT_EQ(response.getStatusCode(), 200);
-		// EXPECT_TRUE(response.getFileData().name == "index.html");
-	}
+	std::cout << "Response Status Line: " << response.getStatusLine() << std::endl;
+	std::cout << "Response: " << response.getBody() << std::endl;
 
 	return 0;
 }

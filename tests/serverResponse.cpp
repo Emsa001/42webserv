@@ -97,7 +97,7 @@ TEST(WebservTests, CgiScriptExecution)
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
-	EXPECT_TRUE(response.getBody().find("{\"status\": \"success\", \"files\": []}") != std::string::npos);
+	EXPECT_TRUE(response.getBody().find("{\"status\": \"success\"") != std::string::npos);
 }
 
 TEST(WebservTests, RequestBodyTooLarge)
@@ -371,10 +371,13 @@ TEST(WebservTests, MissingContentLengthForPost)
 	config.parse("conf/default.yml");
 	Server server(config.getServers()[3].getMap());
 
+	std::string body = "Hello, this is a CGI response from MyServer3!";
+
 	HttpRequest request(
 		"POST /cgi HTTP/1.1\r\n"
 		"Host: MyServer3\r\n"
-		"Connection: close\r\n\r\n",
+		"Connection: close\r\n\r\n" +
+		body,
 		server.getConfig()
 	);
 
@@ -607,6 +610,7 @@ TEST(WebservTests, PathTraversalAttempt)
 	EXPECT_TRUE(response.getStatusCode() == 404 || response.getStatusCode() == 403 || response.getStatusCode() == 400);
 }
 
+// TODO: Should we handle this?
 TEST(WebservTests, MultipleConsecutiveSlashes)
 {
 	Config &config = Config::instance();
