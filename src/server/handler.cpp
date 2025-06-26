@@ -33,10 +33,11 @@ bool SocketHandler::InitSockets()
     int sock = newfd.fd;
     int flags = fcntl(sock, F_GETFL, 0);
     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
-    
+
     // Enable TCP Keepalive
     int optval = 1;
     setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
     int keep_idle = 10;     // Start checking after 10 second of inactivity
     int keep_interval = 5;  // Send keep-alive probes every 5 second
@@ -45,7 +46,6 @@ bool SocketHandler::InitSockets()
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, NULL, NULL);
 
     std::cout << "socket fd is " << newfd.fd << std::endl;
     std::cout << "bind: " << bind(newfd.fd, res->ai_addr, res->ai_addrlen) << std::endl;
@@ -89,13 +89,12 @@ int SocketHandler::run()
                     std::cout << "new fd is " << newconn.fd << std::endl;
                     // append to pollfds array
                     _pollfds.push_back(newconn);
-                    // reset receivecd events
                     // event on active connection
                 // the event was on an open connection
                 } else {
-                    std::cout << "read" << std::endl;
+                    std::cout << "read" << it->fd << std::endl;
                     char buffer[128];
-                    int res = read(it->fd, buffer, 128);
+                    int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     if (res <= 0) {
                         perror("error: ");
                     }
