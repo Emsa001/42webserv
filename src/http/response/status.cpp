@@ -1,88 +1,93 @@
 #include "HttpResponse.hpp"
 
 std::string HttpResponse::getReasonPhrase(unsigned short code) {
-    switch (code) {
-        case 100: return "Continue";
-        case 101: return "Switching Protocols";
-        case 102: return "Processing"; // WebDAV
-        case 103: return "Early Hints"; 
-
-        case 200: return "OK";
-        case 201: return "Created";
-        case 202: return "Accepted";
-        case 203: return "Non-Authoritative Information";
-        case 204: return "No Content";
-        case 205: return "Reset Content";
-        case 206: return "Partial Content";
-        case 207: return "Multi-Status"; // WebDAV
-        case 208: return "Already Reported"; // WebDAV
-        case 226: return "IM Used"; // HTTP Delta encoding
-
-        case 300: return "Multiple Choices";
-        case 301: return "Moved Permanently";
-        case 302: return "Found";
-        case 303: return "See Other";
-        case 304: return "Not Modified";
-        case 305: return "Use Proxy";
-        case 306: return "Switch Proxy"; // Deprecated
-        case 307: return "Temporary Redirect";
-        case 308: return "Permanent Redirect";
-
-        case 400: return "Bad Request";
-        case 401: return "Unauthorized";
-        case 402: return "Payment Required";
-        case 403: return "Forbidden";
-        case 404: return "Not Found";
-        case 405: return "Method Not Allowed";
-        case 406: return "Not Acceptable";
-        case 407: return "Proxy Authentication Required";
-        case 408: return "Request Timeout";
-        case 409: return "Conflict";
-        case 410: return "Gone";
-        case 411: return "Length Required";
-        case 412: return "Precondition Failed";
-        case 413: return "Payload Too Large";
-        case 414: return "URI Too Long";
-        case 415: return "Unsupported Media Type";
-        case 416: return "Range Not Satisfiable";
-        case 417: return "Expectation Failed";
-        case 418: return "I'm a teapot"; // April Fools' joke but part of the spec
-        case 421: return "Misdirected Request";
-        case 422: return "Unprocessable Entity"; // WebDAV
-        case 423: return "Locked"; // WebDAV
-        case 424: return "Failed Dependency"; // WebDAV
-        case 425: return "Too Early";
-        case 426: return "Upgrade Required";
-        case 428: return "Precondition Required";
-        case 429: return "Too Many Requests";
-        case 431: return "Request Header Fields Too Large";
-        case 451: return "Unavailable For Legal Reasons";
-
-        case 500: return "Internal Server Error";
-        case 501: return "Not Implemented";
-        case 502: return "Bad Gateway";
-        case 503: return "Service Unavailable";
-        case 504: return "Gateway Timeout";
-        case 505: return "HTTP Version Not Supported";
-        case 506: return "Variant Also Negotiates";
-        case 507: return "Insufficient Storage"; // WebDAV
-        case 508: return "Loop Detected"; // WebDAV
-        case 510: return "Not Extended";
-        case 511: return "Network Authentication Required";
-        
-        case 512: return "Beqa is nerd";
-        case 513: return "Beqa's loop detected";
-        case 514: return "Internal Beqa's failure";
-        case 515: return "Beqa's version not supported";
-        case 517: return "Beqa's service unavailable";
-        case 516: return "Not Beqa's implemented";
-        case 518: return "Beqa's gateway";
-        case 519: return "Too many Beqas";
-        case 520: return "Too few Beqas";
-        case 521: return "Beqa's network authentication required";
-
-        default: return "Unknown Status";
+    // Use a static array of pairs for C++98 compatibility.
+    struct StatusPhrase {
+        unsigned short code;
+        const char* phrase;
+    };
+    static const StatusPhrase statusPhrases[] = {
+        {100, "Continue"},
+        {101, "Switching Protocols"},
+        {102, "Processing"},
+        {103, "Early Hints"},
+        {200, "OK"},
+        {201, "Created"},
+        {202, "Accepted"},
+        {203, "Non-Authoritative Information"},
+        {204, "No Content"},
+        {205, "Reset Content"},
+        {206, "Partial Content"},
+        {207, "Multi-Status"},
+        {208, "Already Reported"},
+        {226, "IM Used"},
+        {300, "Multiple Choices"},
+        {301, "Moved Permanently"},
+        {302, "Found"},
+        {303, "See Other"},
+        {304, "Not Modified"},
+        {305, "Use Proxy"},
+        {306, "Switch Proxy"},
+        {307, "Temporary Redirect"},
+        {308, "Permanent Redirect"},
+        {400, "Bad Request"},
+        {401, "Unauthorized"},
+        {402, "Payment Required"},
+        {403, "Forbidden"},
+        {404, "Not Found"},
+        {405, "Method Not Allowed"},
+        {406, "Not Acceptable"},
+        {407, "Proxy Authentication Required"},
+        {408, "Request Timeout"},
+        {409, "Conflict"},
+        {410, "Gone"},
+        {411, "Length Required"},
+        {412, "Precondition Failed"},
+        {413, "Payload Too Large"},
+        {414, "URI Too Long"},
+        {415, "Unsupported Media Type"},
+        {416, "Range Not Satisfiable"},
+        {417, "Expectation Failed"},
+        {418, "I'm a teapot"},
+        {421, "Misdirected Request"},
+        {422, "Unprocessable Entity"},
+        {423, "Locked"},
+        {424, "Failed Dependency"},
+        {425, "Too Early"},
+        {426, "Upgrade Required"},
+        {428, "Precondition Required"},
+        {429, "Too Many Requests"},
+        {431, "Request Header Fields Too Large"},
+        {451, "Unavailable For Legal Reasons"},
+        {500, "Internal Server Error"},
+        {501, "Not Implemented"},
+        {502, "Bad Gateway"},
+        {503, "Service Unavailable"},
+        {504, "Gateway Timeout"},
+        {505, "HTTP Version Not Supported"},
+        {506, "Variant Also Negotiates"},
+        {507, "Insufficient Storage"},
+        {508, "Loop Detected"},
+        {510, "Not Extended"},
+        {511, "Network Authentication Required"},
+        // Custom codes
+        {512, "Beqa is nerd"},
+        {513, "Beqa's loop detected"},
+        {514, "Internal Beqa's failure"},
+        {515, "Beqa's version not supported"},
+        {516, "Not Beqa's implemented"},
+        {517, "Beqa's service unavailable"},
+        {518, "Beqa's gateway"},
+        {519, "Too many Beqas"},
+        {520, "Too few Beqas"},
+        {521, "Beqa's network authentication required"}
+    };
+    const size_t numPhrases = sizeof(statusPhrases) / sizeof(StatusPhrase);
+    for (size_t i = 0; i < numPhrases; ++i) {
+        if (statusPhrases[i].code == code)
+            return statusPhrases[i].phrase;
     }
+    return "Unknown Status";
 }
 
 std::string const HttpResponse::getDefaultStatusPage() {
