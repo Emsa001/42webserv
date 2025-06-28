@@ -6,7 +6,7 @@ void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
     Server server(*data);
     std::cout << std::endl;
-    server.start();
+    // server.start();
     std::cout << std::endl;
     return NULL;
 }
@@ -36,7 +36,8 @@ int main()
 
 	return 0;
     //TODO: replace threads
-
+    
+    Logger::init();
     // Server s(it->getMap());
     // s.start();
     SocketHandler sh;

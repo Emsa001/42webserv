@@ -48,17 +48,43 @@ bool SocketHandler::InitSockets()
     // std::cout << res->ai_family << std::endl;
     newfd.events = POLLIN;
     newfd.revents = 0;
+    // // std::cout << res->ai_family << std::endl;
+    // newfd.events = POLLIN;
+    // newfd.revents = 0;
+    // newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+
+
+    struct addrinfo hints, *res;
+
+    // first, load up address structs with getaddrinfo():
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+
+    getaddrinfo(NULL, "8080", &hints, &res);
+
+    // make a socket:
+
     newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    std::cout << "socket fd is " << newfd.fd << std::endl;
 
-    int sock = newfd.fd;
-    int flags = fcntl(sock, F_GETFL, 0);
-    fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+    // bind it to the port we passed in to getaddrinfo():
 
-    // Enable TCP Keepalive
+    
+    
+    
+    // int sock = newfd.fd;
+    // int flags = fcntl(sock, F_GETFL, 0);
+    // fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+    
+    // // Enable TCP Keepalive
     int optval = 1;
-    setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-
+    setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+    setsockopt(newfd.fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    
     int keep_idle = 10;     // Start checking after 10 second of inactivity
     int keep_interval = 5;  // Send keep-alive probes every 5 second
     int keep_count = 3;     // Disconnect after 3 failed probes
@@ -83,10 +109,10 @@ int SocketHandler::run()
 {
     if (!InitSockets())
         return -1;
+
     // Server main control loop
     while (true)
     {
-        // std::cout << _sockets[0].revents << std::endl;
         if (poll((struct pollfd *)_pollfds.data(), _pollfds.size(), -1) < 0)
         {
             perror("err: ");
@@ -101,6 +127,8 @@ int SocketHandler::run()
 
             struct sockaddr_in addr;
             socklen_t addrlen;
+            
+            // std::cout << "revents: " << it->revents << std::endl;
             if (it->revents & POLLIN) {
                 // the event was on a socket
                 if (i < _num_sockets) {
@@ -153,6 +181,8 @@ int SocketHandler::run()
                         Logger::info("removing");
                         perror("error2: ");
                     }
+
+                    // HttpRequest r();
                 }
             }
             it->revents = 0;

@@ -1,8 +1,8 @@
 #include "Webserv.hpp"
 
-bool Server::isStop(){
-    return g_stop;
-}
+// bool Server::isStop(){
+//     return g_stop;
+// }
 
 // void Server::listener(int server_sock) {
 //     listen(server_sock, MAX_CLIENTS);
