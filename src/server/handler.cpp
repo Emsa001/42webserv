@@ -3,20 +3,23 @@
 
 #include <string>
 
-SocketHandler::SocketHandler(const config_array& servers) : _serversConfig(servers)
+SocketHandler::SocketHandler(const config_array& servers)
 {
     std::cout << "SocketHandler()" << std::endl;
 
-    Server server(servers[0]);
-    _servers.push_back(server);
+    // init servers for request handling
+    for (config_array::const_iterator it = servers.begin(); it != servers.end(); ++it) {
+        Server server(*it);
+        _servers.push_back(server);
+    }
 }
 
-SocketHandler::SocketHandler()
-{
-    Config &config = Config::instance();
-    config.parse("conf/default.yml");
-    _serversConfig = config.getServers();
-}
+// SocketHandler::SocketHandler()
+// {
+//     Config &config = Config::instance();
+//     config.parse("conf/default.yml");
+//     _serversConfig = config.getServers();
+// }
 
 SocketHandler::~SocketHandler()
 {
@@ -26,14 +29,17 @@ SocketHandler::~SocketHandler()
 bool SocketHandler::InitSockets()
 {
     struct addrinfo hints, *res;
+    int s;
 
     memset(&hints, 0, sizeof hints); // make sure the struct is empty
     hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;     //
     
+    std::string host = "0.0.0.0";//Config::getSafe(_servers[0].getConfig(), "listen");
+    std::string port = Config::getSafe(_servers[0].getConfig(), "listen");
     int r;
-    if (r = getaddrinfo("127.0.0.1", "8080", &hints, &res) < 0)
+    if (r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res) < 0)
         perror("getaddrinfo");
     // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
     struct pollfd newfd;
@@ -60,9 +66,14 @@ bool SocketHandler::InitSockets()
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
 
-    std::cout << "socket fd is " << newfd.fd << std::endl;
-    std::cout << "bind: " << bind(newfd.fd, res->ai_addr, res->ai_addrlen) << std::endl;
-    std::cout << "listen: " << listen(newfd.fd, 10) << std::endl;
+    Logger::info(" socket() = " + intToString(sock));
+
+    s = bind(newfd.fd, res->ai_addr, res->ai_addrlen);
+    Logger::info(" bind() = " + intToString(s));
+
+    s = listen(newfd.fd, 10);
+    Logger::info(" listen() =  " + intToString(s));
+
     _pollfds.push_back(newfd);
     _num_sockets = 1;
     return true;
@@ -93,7 +104,7 @@ int SocketHandler::run()
             if (it->revents & POLLIN) {
                 // the event was on a socket
                 if (i < _num_sockets) {
-                    Logger::debug("New connection");
+                    // Logger::debug("New connection");
                     // accept connection and add it to the fds to watch
                     struct pollfd newconn;
                     newconn.events = POLLIN;
@@ -106,8 +117,8 @@ int SocketHandler::run()
                     // Logger::debug("fd is")
                     // std::cout << "new fd is " << newconn.fd << std::endl;
 
-                    std::map<int, ClientRequestState>::iterator exstReq = _requests.find(it->fd);
-                    if (exstReq != _requests.end()) {
+                    std::map<int, ClientRequestState>::iterator exstReq = _conns.find(it->fd);
+                    if (exstReq != _conns.end()) {
                         // TODO: error, request exists?!
                     }
                     ClientRequestState newReq;
@@ -117,28 +128,27 @@ int SocketHandler::run()
                     newReq.buffer.clear();
 
                     // create new connection, consisting of request and pollfd
-                    _requests[newconn.fd] = newReq;
+                    _conns[newconn.fd] = newReq;
                     // append to pollfds array
                     _pollfds.push_back(newconn);
                 // event on open connection
                 } else {
-                    Logger::debug("data from conn");
+                    // Logger::debug("data from conn");
                     char buffer[4096]; // TODO: BUFSIZE
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     // TODO: error check `res`
-                    _requests[it->fd].buffer.append(buffer, res);
+                    _conns[it->fd].buffer.append(buffer, res);
                     shutdown(it->fd, 0); // no reads anymore
 
-                    HttpRequest request(_requests[it->fd].buffer, _serversConfig[0]);
+                    HttpRequest request(_conns[it->fd].buffer, _servers[0].getConfig());
+                    request.parse();
+                    Logger::info(request.getMethod() + " " + request.getURI());
                     HttpResponse response = _servers.at(0).handleResponse(&request);
-                    response.build();
-                    // std::cout << "response: " << response.getResponse() << std::endl;
-
-                    std::string reply = response.getResponse();//"HTTP/1.1 200 OK\n\rHost: test\n\r\n\rtest\n";
-                    if (send(it->fd, reply.c_str(), reply.size(), 0) < 0)
+                    std::string responseStr = response.getResponse();//"HTTP/1.1 200 OK\n\rHost: test\n\r\n\rtest\n";
+                    if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
                         perror("error3: ");
                     close(it->fd);
-                    _pollfds.pop_back();
+                    _pollfds.pop_back(); // TODO: remove correct connectio
                     if (res <= 0) {
                         Logger::info("removing");
                         perror("error2: ");

@@ -7,10 +7,11 @@
 
 #include "Webserv.hpp"
 
+class Server;
+
 struct ClientRequestState;
 class SocketHandler {
 private:
-    config_array _serversConfig;
     std::vector<Server> _servers;
     std::vector<pollfd> _pollfds;
     int _num_sockets;
@@ -26,7 +27,7 @@ private:
     // TODO: Move this to SocketHandler
     std::vector<pollfd> fds;
     // std::map<int, time_t> client_timestamps;
-    std::map<int, ClientRequestState> _requests;
+    std::map<int, ClientRequestState> _conns;
 
     // TODO: Move this to SocketHandler
     // void listener(int server_sock);
@@ -42,7 +43,7 @@ private:
 
 public:
     SocketHandler(const config_array& servers);
-    SocketHandler();
+    // SocketHandler();
     ~SocketHandler();
 
     bool InitSockets();
