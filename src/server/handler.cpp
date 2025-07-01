@@ -36,8 +36,8 @@ bool SocketHandler::InitSockets()
     hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;     //
     
-    std::string host = "0.0.0.0";//Config::getSafe(_servers[0].getConfig(), "listen");
-    std::string port = Config::getSafe(_servers[0].getConfig(), "listen");
+    std::string const host = "0.0.0.0";//Config::getSafe(_servers[0].getConfig(), "listen");
+    std::string const port = Config::getSafe(_servers[0].getConfig(), "listen");
     int r;
     if (r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res) < 0)
         perror("getaddrinfo");
@@ -104,7 +104,7 @@ int SocketHandler::run()
             if (it->revents & POLLIN) {
                 // the event was on a socket
                 if (i < _num_sockets) {
-                    // Logger::debug("New connection");
+                    Logger::debug("New connection");
                     // accept connection and add it to the fds to watch
                     struct pollfd newconn;
                     newconn.events = POLLIN;
