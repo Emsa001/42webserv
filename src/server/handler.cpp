@@ -3,16 +3,19 @@
 
 #include <string>
 
-SocketHandler::SocketHandler(const config_array& servers) : _servers(servers)
+SocketHandler::SocketHandler(const config_array& servers) : _serversConfig(servers)
 {
     std::cout << "SocketHandler()" << std::endl;
+
+    Server server(servers[0]);
+    _servers.push_back(server);
 }
 
 SocketHandler::SocketHandler()
 {
     Config &config = Config::instance();
     config.parse("conf/default.yml");
-    _servers = config.getServers();
+    _serversConfig = config.getServers();
 }
 
 SocketHandler::~SocketHandler()
@@ -122,13 +125,21 @@ int SocketHandler::run()
                     Logger::debug("data from conn");
                     char buffer[4096]; // TODO: BUFSIZE
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
+                    // TODO: error check `res`
+                    _requests[it->fd].buffer.append(buffer, res);
+                    shutdown(it->fd, 0); // no reads anymore
 
-                    std::string reply = "HTTP/1.1 200 OK\n\rHost: test\n\r\n\rtest\n";
+                    HttpRequest request(_requests[it->fd].buffer, _serversConfig[0]);
+                    HttpResponse response = _servers.at(0).handleResponse(&request);
+                    response.build();
+                    // std::cout << "response: " << response.getResponse() << std::endl;
+
+                    std::string reply = response.getResponse();//"HTTP/1.1 200 OK\n\rHost: test\n\r\n\rtest\n";
                     if (send(it->fd, reply.c_str(), reply.size(), 0) < 0)
                         perror("error3: ");
                     close(it->fd);
+                    _pollfds.pop_back();
                     if (res <= 0) {
-                        _pollfds.pop_back();
                         Logger::info("removing");
                         perror("error2: ");
                     }

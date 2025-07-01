@@ -10,7 +10,8 @@
 struct ClientRequestState;
 class SocketHandler {
 private:
-    config_array _servers;
+    config_array _serversConfig;
+    std::vector<Server> _servers;
     std::vector<pollfd> _pollfds;
     int _num_sockets;
 

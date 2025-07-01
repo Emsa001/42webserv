@@ -92,7 +92,7 @@ static bool validateHeaders(const std::string& headers) {
 // }
 
 
-// // TODO: This part will be dont by SocketHandler, Server functionality will be limited to handleRespose method
+// TODO: This part will be dont by SocketHandler, Server functionality will be limited to handleRespose method
 // void Server::handleClientRead(size_t index) {
 //     int fd = this->fds[index].fd;
 //     char buffer[READ_BUFFER_SIZE];
