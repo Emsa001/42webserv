@@ -11,24 +11,6 @@ class Server
 {
 private:
     config_map config;
-
-    // TODO: Move this to SocketHandler
-    std::vector<pollfd> fds;
-    std::map<int, time_t> client_timestamps;
-    std::map<int, ClientRequestState> requestStates;
-
-    // TODO: Move this to SocketHandler
-    void listener(int server_sock);
-    void setNonBlocking(int sock);
-    void acceptNewConnections(int server_sock);
-    void handleClientRead(size_t index);
-    void checkIdleClients();
-    void removeClient(size_t index);
-
-    // TODO: Move this to SocketHandler
-    ClientRequestState *readChunk(int fd, int index, char *buffer);
-    int readBytes(int fd, int index, char *buffer);
-
     // Helper methods
     bool isValidMethod(HttpRequest *request, const config_map &location);
     bool isRedirect(HttpResponse &response, const config_map &location);

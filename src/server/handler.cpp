@@ -1,7 +1,9 @@
 #include "Webserv.hpp"
 #include "SocketHandler.hpp"
 
-SocketHandler::SocketHandler(config_array &servers) : _servers(servers)
+#include <string>
+
+SocketHandler::SocketHandler(const config_array& servers) : _servers(servers)
 {
     std::cout << "SocketHandler()" << std::endl;
 }
@@ -21,10 +23,19 @@ SocketHandler::~SocketHandler()
 bool SocketHandler::InitSockets()
 {
     struct addrinfo hints, *res;
+
+    memset(&hints, 0, sizeof hints); // make sure the struct is empty
+    hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+    hints.ai_flags = AI_PASSIVE;     //
+    
     int r;
-    if (r = getaddrinfo("127.0.0.1", "8080", NULL, &res) < 0)
+    if (r = getaddrinfo("127.0.0.1", "8080", &hints, &res) < 0)
         perror("getaddrinfo");
-    struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
+    // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
+    struct pollfd newfd;
+    newfd.events = POLLIN;
+    newfd.revents = 0;
     // std::cout << res->ai_family << std::endl;
     newfd.events = POLLIN;
     newfd.revents = 0;
@@ -42,7 +53,6 @@ bool SocketHandler::InitSockets()
     int keep_idle = 10;     // Start checking after 10 second of inactivity
     int keep_interval = 5;  // Send keep-alive probes every 5 second
     int keep_count = 3;     // Disconnect after 3 failed probes
-    
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
@@ -68,35 +78,59 @@ int SocketHandler::run()
             perror("err: ");
             return -2;
         }
-        std::cout << "poll is over " << std::endl;
-        for (std::vector<struct pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
-        {
-            int i = std::distance(_pollfds.begin(), it);
+        // std::cout << "poll is over " << std::endl;
+        // for (std::vector<struct pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
+        // {
+        for (int i=0; i<_pollfds.size(); ++i) {
+            struct pollfd *it = &_pollfds[i];
+            // int i = std::distance(_pollfds.begin(), it);
 
             struct sockaddr_in addr;
             socklen_t addrlen;
             if (it->revents & POLLIN) {
                 // the event was on a socket
                 if (i < _num_sockets) {
-                    std::cout << "New connection" << std::endl;
+                    Logger::debug("New connection");
                     // accept connection and add it to the fds to watch
                     struct pollfd newconn;
-                    newconn.fd = accept(it->fd, (sockaddr *) &addr, &addrlen);
-                    if (newconn.fd < 0)
-                        perror("error: ");
                     newconn.events = POLLIN;
                     newconn.revents = 0;
-                    std::cout << "new fd is " << newconn.fd << std::endl;
+                    newconn.fd = accept(it->fd, (sockaddr *) &addr, &addrlen);
+                    if (newconn.fd < 0) {
+                        Logger::error("Connection error - invalid fd");
+                    }
+
+                    // Logger::debug("fd is")
+                    // std::cout << "new fd is " << newconn.fd << std::endl;
+
+                    std::map<int, ClientRequestState>::iterator exstReq = _requests.find(it->fd);
+                    if (exstReq != _requests.end()) {
+                        // TODO: error, request exists?!
+                    }
+                    ClientRequestState newReq;
+                    newReq.contentLength = 0;
+                    newReq.expectedSize = -1;
+                    newReq.headersParsed = false;
+                    newReq.buffer.clear();
+
+                    // create new connection, consisting of request and pollfd
+                    _requests[newconn.fd] = newReq;
                     // append to pollfds array
                     _pollfds.push_back(newconn);
-                    // event on active connection
-                // the event was on an open connection
+                // event on open connection
                 } else {
-                    std::cout << "read" << it->fd << std::endl;
-                    char buffer[128];
+                    Logger::debug("data from conn");
+                    char buffer[4096]; // TODO: BUFSIZE
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
+
+                    std::string reply = "HTTP/1.1 200 OK\n\rHost: test\n\r\n\rtest\n";
+                    if (send(it->fd, reply.c_str(), reply.size(), 0) < 0)
+                        perror("error3: ");
+                    close(it->fd);
                     if (res <= 0) {
-                        perror("error: ");
+                        _pollfds.pop_back();
+                        Logger::info("removing");
+                        perror("error2: ");
                     }
                 }
             }
