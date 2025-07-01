@@ -82,11 +82,12 @@ std::string HttpResponse::getReasonPhrase(unsigned short code) {
         {520, "Too few Beqas"},
         {521, "Beqa's network authentication required"}
     };
+
     const size_t numPhrases = sizeof(statusPhrases) / sizeof(StatusPhrase);
-    for (size_t i = 0; i < numPhrases; ++i) {
+    for (size_t i = 0; i < numPhrases; ++i)
         if (statusPhrases[i].code == code)
             return statusPhrases[i].phrase;
-    }
+
     return "Unknown Status";
 }
 

@@ -30,7 +30,9 @@ private:
     int readBytes(int fd, int index, char *buffer);
 
     // Helper methods
-    void isValidMethod(HttpRequest *request, const config_map &location);
+    bool isValidMethod(HttpRequest *request, const config_map &location);
+    bool isRedirect(HttpResponse &response, const config_map &location);
+
     const FileData createFileData(const config_map *location, HttpRequest *request) const;
 
 public:

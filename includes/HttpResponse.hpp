@@ -14,13 +14,13 @@ class HttpResponse : public HttpMessage {
         config_map config;               ///< Server or location configuration
 
         FileData fileData;               ///< File data that was used to build the response (saved for debugging and testing)
-        const config_map *locationData;   ///< Location-specific configuration data (saved for debugging and testing)
         
         std::string statusLine;          ///< Stores "HTTP/1.1 200 OK"
         std::string response;            ///< Entire response to be sent to the client
         
         bool listing;                    ///< True if body is a directory listing
         bool cgi;                        ///< True if body is CGI script output
+
         unsigned short statusCode;       ///< HTTP status code (e.g., 200)
         
 
@@ -77,13 +77,12 @@ class HttpResponse : public HttpMessage {
         // --- Setters ---
 
         void setResponse(const std::string &response) { this->response = response; }
-        void setSettings();
+        void setSettings(const config_map &location);
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);
         }
         void setFileData(FileData &fileData) { this->fileData = fileData;}
-        void setLocationData(const config_map *locationData) { this->locationData = locationData; }
         
         // --- Getters ---
 
@@ -97,7 +96,6 @@ class HttpResponse : public HttpMessage {
         bool isListing() const { return listing; }
         
         const FileData getFileData() const { return fileData; }
-        const config_map *getLocationData() const { return locationData; }
 };
 
 #endif

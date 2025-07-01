@@ -20,37 +20,39 @@ HttpResponse Server::handleResponse(HttpRequest *request) {
     std::string connectionHeader = "close";
 
     try {
-        // TODO: Should we parse it here? (Is nice because in one try catch block and automatically handles error page)
 		request->parse();
 
-        // Set the Connection header in the response based on the request
+        // Set the "Connection" header based on the request
         response.setHeader("Connection", request->getHeader("Connection") == "close" ? "close" : "keep-alive");
 
-        // Find the configuration for the requested URL path
+        // Find the location
         const config_map *location = this->findLocation(request->getURL()->getPath());
-        response.setLocationData(location);
-        if (location == NULL) {
+        if (location == NULL)
             throw HttpRequestException(404); // No matching location found
-        }
         
-        // Validate that the HTTP method is allowed for this location
-        this->isValidMethod(request, *location);
+        // Validate the method
+        if(!this->isValidMethod(request, *location))
+            throw HttpRequestException(405);
         
+        // Check if redirection
+        if(this->isRedirect(response, *location))
+            return response;
+
         // Attempt to create file data for the requested resource
         FileData fileData = this->createFileData(location, request);
         response.setFileData(fileData);
 
+        // Check if the file exists
         if (!fileData.exists) 
-            throw HttpRequestException(404); // File not found
+            throw HttpRequestException(404);
        
-        response.setSettings(); // Apply location-specific settings
-        response.buildBody(fileData, request); // Build the response body
+        response.setSettings(*location);
+        response.buildBody(fileData, request); 
 
         // TODO: Client timestamp update should be handled in SocketHandler
         // this->client_timestamps[client_sock] = time(NULL);
 
     } catch(const HttpRequestException &e) {
-        // Respond with the appropriate error status page
         response.respondStatusPage(e.getStatusCode());
     }
 
@@ -59,15 +61,21 @@ HttpResponse Server::handleResponse(HttpRequest *request) {
 }
 
 
-/*
 
-    isValidMethod checks if the HTTP method of the request is allowed for the given location (configurable by user in config.yml).
-    If the method is not allowed, it throws an HttpRequestException with a 405 status code.
 
-*/
-void Server::isValidMethod(HttpRequest *request, const config_map &location){
+bool Server::isValidMethod(HttpRequest *request, const config_map &location){
     std::string methods = Config::getSafe(location, "methods", (std::string)DEFAULT_METHODS).getString();
-    if (methods.find(request->getMethod()) == std::string::npos) {
-        throw HttpRequestException(405);
+    return methods.find(request->getMethod()) == std::string::npos;
+}
+
+bool Server::isRedirect(HttpResponse &response, const config_map &location) {
+    std::string redirect = Config::getSafe(location, "redirect", (std::string) "").getString();
+    if (!redirect.empty()) {
+        response.setStatusCode(301); // Moved Permanently
+        response.setHeader("Location", redirect);
+        response.setBody(""); // No body for redirects
+        return true;
     }
+
+    return false;
 }

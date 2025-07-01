@@ -176,8 +176,9 @@ TEST(WebservTests, IndexLocation)
 		HttpResponse response = server.handleResponse(&request);
 
 		const FileData fileData = response.getFileData();
-		const config_map *locationData = response.getLocationData();
-		std::string index = Config::getSafe(*locationData, "index", ConfigValue("index.html")).getString();
+		const config_map *location = server.findLocation(request.getURL()->getPath());
+
+		std::string index = Config::getSafe(*location, "index", ConfigValue("index.html")).getString();
 	
 		EXPECT_EQ(index, "index" + intToString(i) + ".html");
 	}

@@ -55,6 +55,12 @@ server1:
         root: "/myserver1/"
         methods: "GET"
     
+    location:
+        path: "/redirect"
+        root: "/myserver1/"
+        methods: "GET"  
+        redirect: "http://localhost:8080/"
+
     errors:
         500: "500.html"
         404: "myserver1/errors/404.html"

@@ -4,10 +4,10 @@ int main()
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
-	Server server(config.getServers()[0].getMap());
+	Server server(config.getServers()[1].getMap());
 
 	HttpRequest request(
-		"GET // HTTP/1.1\r\n"
+		"GET /redirect HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
 		"Connection: close\r\n\r\n",
 		server.getConfig()
