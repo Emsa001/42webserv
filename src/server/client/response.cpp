@@ -65,7 +65,7 @@ HttpResponse Server::handleResponse(HttpRequest *request) {
 
 bool Server::isValidMethod(HttpRequest *request, const config_map &location){
     std::string methods = Config::getSafe(location, "methods", (std::string)DEFAULT_METHODS).getString();
-    return methods.find(request->getMethod()) == std::string::npos;
+    return methods.find(request->getMethod()) != std::string::npos;
 }
 
 bool Server::isRedirect(HttpResponse &response, const config_map &location) {
@@ -74,6 +74,7 @@ bool Server::isRedirect(HttpResponse &response, const config_map &location) {
         response.setStatusCode(301); // Moved Permanently
         response.setHeader("Location", redirect);
         response.setBody(""); // No body for redirects
+        response.build();
         return true;
     }
 
