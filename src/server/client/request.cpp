@@ -1,18 +1,18 @@
 #include "Webserv.hpp"
 
 // Simple header validation: checks for a valid HTTP request line
-static bool validateHeaders(const std::string& headers) {
-    size_t firstLineEnd = headers.find("\r\n");
-    if (firstLineEnd == std::string::npos) return false;
-    std::string requestLine = headers.substr(0, firstLineEnd);
-    // Basic check: METHOD SP URI SP HTTP/VERSION
-    size_t methodEnd = requestLine.find(' ');
-    if (methodEnd == std::string::npos) return false;
-    size_t uriEnd = requestLine.find(' ', methodEnd + 1);
-    if (uriEnd == std::string::npos) return false;
-    if (requestLine.find("HTTP/") == std::string::npos) return false;
-    return true;
-}
+// static bool validateHeaders(const std::string& headers) {
+//     size_t firstLineEnd = headers.find("\r\n");
+//     if (firstLineEnd == std::string::npos) return false;
+//     std::string requestLine = headers.substr(0, firstLineEnd);
+//     // Basic check: METHOD SP URI SP HTTP/VERSION
+//     size_t methodEnd = requestLine.find(' ');
+//     if (methodEnd == std::string::npos) return false;
+//     size_t uriEnd = requestLine.find(' ', methodEnd + 1);
+//     if (uriEnd == std::string::npos) return false;
+//     if (requestLine.find("HTTP/") == std::string::npos) return false;
+//     return true;
+// }
 
 // int Server::readBytes(int fd, int index, char *buffer){
 //     const int bytes_read = recv(fd, buffer, sizeof(buffer), 0);

@@ -49,6 +49,8 @@ HttpResponse Server::handleResponse(HttpRequest *request, const config_map &serv
         response.setSettings(*location);
         response.buildBody(fileData, request); 
 
+        std::cout << "response: " << response.getResponse() << std::endl;
+
         // TODO: Client timestamp update should be handled in SocketHandler
         // this->client_timestamps[client_sock] = time(NULL);
 

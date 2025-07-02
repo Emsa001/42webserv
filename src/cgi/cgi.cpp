@@ -87,7 +87,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         char *args[2];
         args[0] = str_char(scriptPath);
         args[1] = NULL;
-        StringMap envMap = get_env(scriptPath, request);
+        StringMap envMap = this->get_env(scriptPath, request);
         char **env = convert_env(envMap);
 
         if (execve(scriptPath.c_str(), args, env) == -1)

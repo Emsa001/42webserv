@@ -43,6 +43,13 @@ server0:
         root: "/mainserver/"
         methods: "GET"
 
+    location:
+        path: "/cookies"
+        root: "/myserver2/cgi/"
+        index: "cookies.py"
+        cgi: true
+        methods: "GET"
+
 server1:
     server_name: "MyServer1"
     listen: "8080"
@@ -88,6 +95,13 @@ server2:
         path: "/secret"
         root: "/myserver2/"
         index: "hidden.html"
+
+    location:
+        path: "/cookies"
+        root: "/myserver2/cgi/"
+        index: "cookies.py"
+        cgi: true
+        methods: "GET"
 
     errors:
         500: "500.html"

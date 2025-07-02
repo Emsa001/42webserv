@@ -1,8 +1,6 @@
 #include "Webserv.hpp"
 #include "SocketHandler.hpp"
 
-#include <string>
-
 SocketHandler::SocketHandler(const config_array& servers)
 {
     std::cout << "SocketHandler()" << std::endl;

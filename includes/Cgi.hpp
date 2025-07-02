@@ -16,13 +16,16 @@ class Cgi
             UNKNOWN 
         };
 
-        static char **convert_env(const std::map<std::string, std::string>& env_map);
-        static std::map<std::string, std::string> get_env(const std::string& scriptPath, const HttpRequest *request);
-        static Type detect_type(const std::string &scriptPath);
-        static std::string get_interpreter(Type type);
+        char **convert_env(const std::map<std::string, std::string>& env_map);
+        std::map<std::string, std::string> get_env(const std::string& scriptPath, const HttpRequest *request);
+        Type detect_type(const std::string &scriptPath);
+        std::string get_interpreter(Type type);
+
+        std::string get_query(const std::string &uri);
+        std::string toEnvFormat(const std::string &header);
 
     public:
-        static void execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request);
+        void execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request);
 };
 
 std::string get_body(const std::string &output);

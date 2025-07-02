@@ -32,8 +32,11 @@ class HttpRequest : public HttpMessage {
         std::string method;
         std::string uri;
         std::string version;
+        std::string port;
 
         std::string rawRequestData;
+
+        std::string normalizeUri(const std::string &uri);
 
     public:
         HttpRequest(const std::string &rawData)
@@ -54,6 +57,7 @@ class HttpRequest : public HttpMessage {
         const std::string &getURI() const { return uri; }
         const std::string &getVersion() const { return version; }
         HttpURL *getURL() const { return url; }
+        const std::string &getPort() const { return port; }
         const std::string &getRawRequestData() const { return rawRequestData; }
 };
 

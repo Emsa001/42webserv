@@ -25,6 +25,7 @@
 // network headers (for TCP)
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <arpa/inet.h>
 
 // c headers
 #include <unistd.h>

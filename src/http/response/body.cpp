@@ -48,7 +48,8 @@ void HttpResponse::buildBody(FileData &fileData, const HttpRequest *request) {
     }
 
     if(this->cgi){
-        Cgi::execute(fileData.path, this, request);
+        Cgi cgi;
+        cgi.execute(fileData.path, this, request);
         return ;
     }
 

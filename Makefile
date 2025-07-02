@@ -51,7 +51,7 @@ format:
 TEST_CXXFLAGS		+= -I$(GTESTDIR)/googletest/include -g -I$(INCDIR)
 TEST_LDFLAGS		+= -L$(GTESTDIR)/build/lib
 TEST_LDLIBS			+= -lgtest
-TEST_MAIN			= tests/test.cpp tests/serverResponse.cpp
+TEST_MAIN			= $(wildcard tests/*.cpp)
 TEST_OBJ			= $(filter-out %/main.o, $(OBJ))
 
 GTESTDIR = gtest

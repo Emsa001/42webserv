@@ -20,7 +20,7 @@
 
 */
 
-TEST(WebservTests, BasicGetRootMainServer)
+TEST(WebservResponseTests, BasicGetRootMainServer)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -41,7 +41,7 @@ TEST(WebservTests, BasicGetRootMainServer)
 	EXPECT_EQ(response.getStatusCode(), 200);
 }
 
-TEST(WebservTests, NotFoundUnknownPath)
+TEST(WebservResponseTests, NotFoundUnknownPath)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -60,7 +60,7 @@ TEST(WebservTests, NotFoundUnknownPath)
 	EXPECT_EQ(response.getStatusCode(), 404);
 }
 
-TEST(WebservTests, AutoindexPublicDirectory)
+TEST(WebservResponseTests, AutoindexPublicDirectory)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -80,7 +80,7 @@ TEST(WebservTests, AutoindexPublicDirectory)
 	EXPECT_TRUE(response.getBody().find("Index of") != std::string::npos);
 }
 
-TEST(WebservTests, CgiScriptExecution)
+TEST(WebservResponseTests, CgiScriptExecution)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -100,7 +100,7 @@ TEST(WebservTests, CgiScriptExecution)
 	EXPECT_TRUE(response.getBody().find("{\"status\": \"success\"") != std::string::npos);
 }
 
-TEST(WebservTests, RequestBodyTooLarge)
+TEST(WebservResponseTests, RequestBodyTooLarge)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -121,7 +121,7 @@ TEST(WebservTests, RequestBodyTooLarge)
 	EXPECT_EQ(response.getStatusCode(), 413); // 413 Payload Too Large
 }
 
-TEST(WebservTests, RequestHeaderTooLarge)
+TEST(WebservResponseTests, RequestHeaderTooLarge)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -139,7 +139,7 @@ TEST(WebservTests, RequestHeaderTooLarge)
 	EXPECT_EQ(response.getStatusCode(), 431); // 431 Request Header Fields Too Large
 }
 
-TEST(WebservTests, MethodNotAllowed)
+TEST(WebservResponseTests, MethodNotAllowed)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -158,7 +158,7 @@ TEST(WebservTests, MethodNotAllowed)
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
 
-TEST(WebservTests, IndexLocation)
+TEST(WebservResponseTests, IndexLocation)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -186,7 +186,7 @@ TEST(WebservTests, IndexLocation)
 
 // === Additional Comprehensive Tests ===
 
-TEST(WebservTests, CustomErrorPage404)
+TEST(WebservResponseTests, CustomErrorPage404)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -205,7 +205,7 @@ TEST(WebservTests, CustomErrorPage404)
 	// Should use custom error page defined in MyServer1 config
 }
 
-TEST(WebservTests, DeleteMethodCgiServer)
+TEST(WebservResponseTests, DeleteMethodCgiServer)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -224,7 +224,7 @@ TEST(WebservTests, DeleteMethodCgiServer)
 	EXPECT_TRUE(response.isCgi());
 }
 
-TEST(WebservTests, PostWithValidBodySize)
+TEST(WebservResponseTests, PostWithValidBodySize)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -248,7 +248,7 @@ TEST(WebservTests, PostWithValidBodySize)
 	EXPECT_TRUE(response.isCgi());
 }
 
-TEST(WebservTests, SmallBodyLimitServer)
+TEST(WebservResponseTests, SmallBodyLimitServer)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -270,7 +270,7 @@ TEST(WebservTests, SmallBodyLimitServer)
 	EXPECT_EQ(response.getStatusCode(), 413); // Payload Too Large
 }
 
-TEST(WebservTests, KeepAliveConnection)
+TEST(WebservResponseTests, KeepAliveConnection)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -289,7 +289,7 @@ TEST(WebservTests, KeepAliveConnection)
 	EXPECT_TRUE(response.getHeader("Connection") == "keep-alive");
 }
 
-TEST(WebservTests, SecretPathAccess)
+TEST(WebservResponseTests, SecretPathAccess)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -308,7 +308,7 @@ TEST(WebservTests, SecretPathAccess)
 	// Should serve hidden.html as per config
 }
 
-TEST(WebservTests, ContentTypeHeaderValidation)
+TEST(WebservResponseTests, ContentTypeHeaderValidation)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -328,7 +328,7 @@ TEST(WebservTests, ContentTypeHeaderValidation)
 	// Should have appropriate MIME type set
 }
 
-TEST(WebservTests, EmptyRequestBody)
+TEST(WebservResponseTests, EmptyRequestBody)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -348,7 +348,7 @@ TEST(WebservTests, EmptyRequestBody)
 	EXPECT_TRUE(response.isCgi());
 }
 
-TEST(WebservTests, InvalidHTTPMethod)
+TEST(WebservResponseTests, InvalidHTTPMethod)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -366,7 +366,7 @@ TEST(WebservTests, InvalidHTTPMethod)
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
 
-TEST(WebservTests, MissingContentLengthForPost)
+TEST(WebservResponseTests, MissingContentLengthForPost)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -388,7 +388,7 @@ TEST(WebservTests, MissingContentLengthForPost)
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 411);
 }
 
-TEST(WebservTests, HTTPVersionSupport)
+TEST(WebservResponseTests, HTTPVersionSupport)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -406,7 +406,7 @@ TEST(WebservTests, HTTPVersionSupport)
 	// Should handle HTTP/1.0 requests
 }
 
-TEST(WebservTests, DirectoryWithoutTrailingSlash)
+TEST(WebservResponseTests, DirectoryWithoutTrailingSlash)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -425,7 +425,7 @@ TEST(WebservTests, DirectoryWithoutTrailingSlash)
 	EXPECT_TRUE(response.getStatusCode() == 200 || response.getStatusCode() == 301 || response.getStatusCode() == 302);
 }
 
-TEST(WebservTests, ConcurrentRequestHandling)
+TEST(WebservResponseTests, ConcurrentRequestHandling)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -452,7 +452,7 @@ TEST(WebservTests, ConcurrentRequestHandling)
 	}
 }
 
-TEST(WebservTests, LargeValidHeaderSize)
+TEST(WebservResponseTests, LargeValidHeaderSize)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -471,7 +471,7 @@ TEST(WebservTests, LargeValidHeaderSize)
 	EXPECT_EQ(response.getStatusCode(), 200);
 }
 
-TEST(WebservTests, OptionsMethodHandling)
+TEST(WebservResponseTests, OptionsMethodHandling)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -490,7 +490,7 @@ TEST(WebservTests, OptionsMethodHandling)
 	EXPECT_TRUE(response.getStatusCode() == 200 || response.getStatusCode() == 405);
 }
 
-TEST(WebservTests, QueryStringHandling)
+TEST(WebservResponseTests, QueryStringHandling)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -510,7 +510,7 @@ TEST(WebservTests, QueryStringHandling)
 	// CGI should receive query parameters
 }
 
-TEST(WebservTests, ContentLengthMismatch)
+TEST(WebservResponseTests, ContentLengthMismatch)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -532,7 +532,7 @@ TEST(WebservTests, ContentLengthMismatch)
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 413);
 }
 
-TEST(WebservTests, ResponseHeadersPresent)
+TEST(WebservResponseTests, ResponseHeadersPresent)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -555,7 +555,7 @@ TEST(WebservTests, ResponseHeadersPresent)
 	EXPECT_FALSE(response.getHeader("Connection").empty());
 }
 
-TEST(WebservTests, NoHostHeaderHTTP11)
+TEST(WebservResponseTests, NoHostHeaderHTTP11)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -573,7 +573,7 @@ TEST(WebservTests, NoHostHeaderHTTP11)
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 200);
 }
 
-TEST(WebservTests, CaseInsensitiveHeaders)
+TEST(WebservResponseTests, CaseInsensitiveHeaders)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -592,7 +592,7 @@ TEST(WebservTests, CaseInsensitiveHeaders)
 	// Headers should be handled case-insensitively
 }
 
-TEST(WebservTests, PathTraversalAttempt)
+TEST(WebservResponseTests, PathTraversalAttempt)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -612,7 +612,7 @@ TEST(WebservTests, PathTraversalAttempt)
 }
 
 // TODO: Should we handle this?
-TEST(WebservTests, MultipleConsecutiveSlashes)
+TEST(WebservResponseTests, MultipleConsecutiveSlashes)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -631,7 +631,7 @@ TEST(WebservTests, MultipleConsecutiveSlashes)
 	EXPECT_EQ(response.getStatusCode(), 200);
 }
 
-TEST(WebservTests, BinaryPostData)
+TEST(WebservResponseTests, BinaryPostData)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
@@ -659,7 +659,7 @@ TEST(WebservTests, BinaryPostData)
 	EXPECT_TRUE(response.isCgi());
 }
 
-TEST(WebservTests, MaximumPathLength)
+TEST(WebservResponseTests, MaximumPathLength)
 {
 	Config &config = Config::instance();
 	config.parse("conf/default.yml");
