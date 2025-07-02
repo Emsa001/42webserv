@@ -43,43 +43,12 @@ bool SocketHandler::InitSockets()
         perror("getaddrinfo");
     // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
     struct pollfd newfd;
-    newfd.events = POLLIN;
-    newfd.revents = 0;
     // std::cout << res->ai_family << std::endl;
     newfd.events = POLLIN;
     newfd.revents = 0;
-    // // std::cout << res->ai_family << std::endl;
-    // newfd.events = POLLIN;
-    // newfd.revents = 0;
-    // newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-
-
-
-    struct addrinfo hints, *res;
-
-    // first, load up address structs with getaddrinfo():
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
-
-    getaddrinfo(NULL, "8080", &hints, &res);
-
-    // make a socket:
-
     newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    std::cout << "socket fd is " << newfd.fd << std::endl;
+    int sock = newfd.fd;
 
-    // bind it to the port we passed in to getaddrinfo():
-
-    
-    
-    
-    // int sock = newfd.fd;
-    // int flags = fcntl(sock, F_GETFL, 0);
-    // fcntl(sock, F_SETFL, flags | O_NONBLOCK);
-    
     // // Enable TCP Keepalive
     int optval = 1;
     setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));

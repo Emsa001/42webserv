@@ -31,19 +31,11 @@ int main()
 	// std::cout << "Response Status Line: " << response.getStatusLine() << std::endl;
 	// std::cout << "Response: " << response.getBody() << std::endl;
 
+    Logger::init();
 	SocketHandler sh(config.getServers());
 	sh.run();
-
-	return 0;
-    //TODO: replace threads
-    
-    Logger::init();
-    // Server s(it->getMap());
-    // s.start();
-    SocketHandler sh;
-    sh.run();
+    // TODO: replace threads
     // TODO: initialize servers
-
     Logger::destroy();
 
     return 0;
