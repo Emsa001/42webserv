@@ -49,10 +49,11 @@ std::string get_body(const std::string &output)
     return body;
 }
 
+// TODO: Check what is that, can't we just use getHeaders and setHeader from HttpMessage?
 
-StringMap get_headers(const std::string &output)
+StringMultiMap get_headers(const std::string &output)
 {
-    StringMap headers;
+    StringMultiMap headers;
     std::istringstream stream(output);
     std::string line;
 
@@ -73,7 +74,7 @@ StringMap get_headers(const std::string &output)
             if (!value.empty() && value[0] == ' ')
                 value.erase(0, 1);
 
-            headers[key] = value;
+            headers.insert(std::make_pair(key, value));
         }
     }
 
@@ -83,7 +84,7 @@ StringMap get_headers(const std::string &output)
 
 void set_headers(HttpResponse *response, const std::string &output)
 {
-    StringMap headers = get_headers(output);
+    StringMultiMap headers = get_headers(output);
     if(headers.empty())
         throw HttpRequestException(500);
 

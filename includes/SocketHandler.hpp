@@ -7,6 +7,10 @@
 
 #include "Webserv.hpp"
 
+#ifndef TCP_KEEPIDLE
+    #define TCP_KEEPIDLE 4
+#endif
+
 class Server;
 
 struct ClientRequestState;

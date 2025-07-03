@@ -69,7 +69,7 @@ void HttpRequest::parse(const config_map &serverConfig) {
 
             // 5. Accumulate the total header size and throw exceptions if size limits are exceeded
             totalHeaderSize += line.size();
-            this->headers[key] = value;
+            this->setHeader(key, value);
         }
 
         if (totalHeaderSize > maxHeaderSize) {
@@ -83,11 +83,11 @@ void HttpRequest::parse(const config_map &serverConfig) {
         if (this->body.size() > maxBodySize) {
             throw HttpRequestException(413);
         }
-        if(this->body.size() > 0 && this->headers.find("Content-Length") == this->headers.end()) {
+        if(this->body.size() > 0 && this->getHeader("Content-Length") == "") {
             throw HttpRequestException(400); // Content-Length header is required for POST/DELETE with body
         }
-        else if (this->headers.find("Content-Length") != this->headers.end()) {
-            int contentLength = stringToInt(this->headers["Content-Length"]);
+        else if (this->getHeader("Content-Length") != "") {
+            int contentLength = stringToInt(this->getHeader("Content-Length"));
             if (contentLength != this->body.size()) {
                 throw HttpRequestException(400); // Content-Length mismatch
             }

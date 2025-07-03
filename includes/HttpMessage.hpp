@@ -7,7 +7,7 @@
 
 class HttpMessage {
     protected:
-        StringMap headers;       ///< HTTP headers (key-value pairs)
+        StringMultiMap headers;       ///< HTTP headers (key-value pairs)
         std::string body;        ///< HTTP message body (payload)
 
     public:
@@ -15,10 +15,12 @@ class HttpMessage {
         virtual ~HttpMessage() {}
 
         // --- Headers ---
-        void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
-        const StringMap &getHeaders() const { return headers; }
+        void setHeader(const std::string &key, const std::string &value) { 
+            headers.insert(std::make_pair(key, value)); 
+        }
+        const StringMultiMap &getHeaders() const { return headers; }
         std::string getHeader(const std::string &key) const {
-            StringMap::const_iterator it = headers.find(key);
+            StringMultiMap::const_iterator it = headers.find(key);
             return (it != headers.end()) ? it->second : "";
         }
 

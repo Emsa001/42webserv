@@ -10,11 +10,6 @@
 
 // TODO: Move this to SocketHandler
 
-#ifndef TCP_KEEPIDLE
-    #define TCP_KEEPIDLE 4
-#endif
-
-
 // void Server::setNonBlocking(int sock) {
 //     int flags = fcntl(sock, F_GETFL, 0);
 //     fcntl(sock, F_SETFL, flags | O_NONBLOCK);

@@ -25,7 +25,7 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
         
     response->setStatusCode(code);
 
-    StringMap headers = response->getHeaders();
+    StringMultiMap headers = response->getHeaders();
 
     if (headers.find("Content-Type") == headers.end())
     {
