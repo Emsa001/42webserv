@@ -9,3 +9,6 @@ test
 *.pdf
 
 gtest/
+
+*.dSYM
+DS_Store
