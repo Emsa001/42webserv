@@ -131,10 +131,9 @@ int SocketHandler::run()
                     shutdown(it->fd, 0); // no reads anymore
 
                     HttpRequest request(_conns[it->fd].buffer, _servers[0].getConfig());
-                    request.parse();
                     Logger::info(request.getMethod() + " " + request.getURI());
                     HttpResponse response = _servers.at(0).handleResponse(&request);
-                    std::string responseStr = response.getResponse();//"HTTP/1.1 200 OK\n\rHost: test\n\r\n\rtest\n";
+                    std::string responseStr = response.getResponse();
                     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
                         perror("error3: ");
                     close(it->fd);
