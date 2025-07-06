@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - gh-actions
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: install dependencies
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install -y build-essential
+      - name: compile & run tests
+        run: make t
