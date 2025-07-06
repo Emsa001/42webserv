@@ -29,11 +29,10 @@ TEST(WebservResponseTests, BasicGetRootMainServer)
 	HttpRequest request(
 		"GET / HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_FALSE(response.isListing());
 	EXPECT_EQ(response.getBody().length(), stringToInt(response.getHeader("Content-Length")));
@@ -50,11 +49,10 @@ TEST(WebservResponseTests, NotFoundUnknownPath)
 	HttpRequest request(
 		"GET /unknown HTTP/1.1\r\n"
 		"Host: MyServer2\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_FALSE(response.isListing());
 	EXPECT_EQ(response.getStatusCode(), 404);
@@ -69,11 +67,10 @@ TEST(WebservResponseTests, AutoindexPublicDirectory)
 	HttpRequest request(
 		"GET /public HTTP/1.1\r\n"
 		"Host: MyServer2\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isListing());
@@ -89,11 +86,10 @@ TEST(WebservResponseTests, CgiScriptExecution)
 	HttpRequest request(
 		"GET /cgi HTTP/1.1\r\n"
 		"Host: MyServer3\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -113,11 +109,10 @@ TEST(WebservResponseTests, RequestBodyTooLarge)
 		"Host: MyServer3\r\n"
 		"Content-Length: " + std::to_string(largeBody.size()) + "\r\n"
 		"Connection: close\r\n\r\n" +
-		largeBody,
-		server.getConfig()
+		largeBody
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 	EXPECT_EQ(response.getStatusCode(), 413); // 413 Payload Too Large
 }
 
@@ -133,8 +128,8 @@ TEST(WebservResponseTests, RequestHeaderTooLarge)
 		largeHeader += "X-Dummy-Header: value\r\n";
 	largeHeader += "\r\n";
 
-	HttpRequest request(largeHeader, server.getConfig());
-	HttpResponse response = server.handleResponse(&request);
+	HttpRequest request(largeHeader);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 431); // 431 Request Header Fields Too Large
 }
@@ -149,11 +144,10 @@ TEST(WebservResponseTests, MethodNotAllowed)
 		"POST / HTTP/1.1\r\n"
 		"Host: MyServer1\r\n"
 		"Content-Length: 0\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
@@ -172,8 +166,8 @@ TEST(WebservResponseTests, IndexLocation)
 			"Host: MainServer\r\n"
 			"Connection: close\r\n\r\n";
 	
-		HttpRequest request(requestStr, server.getConfig());
-		HttpResponse response = server.handleResponse(&request);
+		HttpRequest request(requestStr);
+		HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 		const FileData fileData = response.getFileData();
 		const config_map *location = server.findLocation(request.getURL()->getPath());
@@ -195,11 +189,10 @@ TEST(WebservResponseTests, CustomErrorPage404)
 	HttpRequest request(
 		"GET /nonexistent HTTP/1.1\r\n"
 		"Host: MyServer1\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 404);
 	// Should use custom error page defined in MyServer1 config
@@ -214,11 +207,10 @@ TEST(WebservResponseTests, DeleteMethodCgiServer)
 	HttpRequest request(
 		"DELETE /cgi HTTP/1.1\r\n"
 		"Host: MyServer3\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -238,11 +230,10 @@ TEST(WebservResponseTests, PostWithValidBodySize)
 		"Content-Length: " + std::to_string(validBody.size()) + "\r\n"
 		"Content-Type: application/x-www-form-urlencoded\r\n"
 		"Connection: close\r\n\r\n" +
-		validBody,
-		server.getConfig()
+		validBody
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -261,11 +252,10 @@ TEST(WebservResponseTests, SmallBodyLimitServer)
 		"Host: MyServer2\r\n"
 		"Content-Length: " + std::to_string(largeBody.size()) + "\r\n"
 		"Connection: close\r\n\r\n" +
-		largeBody,
-		server.getConfig()
+		largeBody
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 413); // Payload Too Large
 }
@@ -279,11 +269,10 @@ TEST(WebservResponseTests, KeepAliveConnection)
 	HttpRequest request(
 		"GET / HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: keep-alive\r\n\r\n",
-		server.getConfig()
+		"Connection: keep-alive\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.getHeader("Connection") == "keep-alive");
@@ -298,11 +287,10 @@ TEST(WebservResponseTests, SecretPathAccess)
 	HttpRequest request(
 		"GET /secret HTTP/1.1\r\n"
 		"Host: MyServer2\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	// Should serve hidden.html as per config
@@ -317,11 +305,10 @@ TEST(WebservResponseTests, ContentTypeHeaderValidation)
 	HttpRequest request(
 		"GET / HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_FALSE(response.getHeader("Content-Type").empty());
@@ -338,11 +325,10 @@ TEST(WebservResponseTests, EmptyRequestBody)
 		"POST /cgi HTTP/1.1\r\n"
 		"Host: MyServer3\r\n"
 		"Content-Length: 0\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -357,11 +343,10 @@ TEST(WebservResponseTests, InvalidHTTPMethod)
 	HttpRequest request(
 		"INVALID / HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
@@ -378,11 +363,10 @@ TEST(WebservResponseTests, MissingContentLengthForPost)
 		"POST /cgi HTTP/1.1\r\n"
 		"Host: MyServer3\r\n"
 		"Connection: close\r\n\r\n" +
-		body,
-		server.getConfig()
+		body
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should handle missing Content-Length gracefully
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 411);
@@ -396,11 +380,10 @@ TEST(WebservResponseTests, HTTPVersionSupport)
 
 	HttpRequest request(
 		"GET / HTTP/1.0\r\n"
-		"Host: MainServer\r\n\r\n",
-		server.getConfig()
+		"Host: MainServer\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	// Should handle HTTP/1.0 requests
@@ -415,11 +398,10 @@ TEST(WebservResponseTests, DirectoryWithoutTrailingSlash)
 	HttpRequest request(
 		"GET /public HTTP/1.1\r\n"
 		"Host: MyServer2\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should either redirect to /public/ or serve directory listing
 	EXPECT_TRUE(response.getStatusCode() == 200 || response.getStatusCode() == 301 || response.getStatusCode() == 302);
@@ -438,11 +420,10 @@ TEST(WebservResponseTests, ConcurrentRequestHandling)
 		HttpRequest request(
 			"GET / HTTP/1.1\r\n"
 			"Host: MainServer\r\n"
-			"Connection: close\r\n\r\n",
-			server.getConfig()
+			"Connection: close\r\n\r\n"
 		);
 
-		HttpResponse response = server.handleResponse(&request);
+		HttpResponse response = server.handleResponse(&request, server.getConfig());
 		responses.push_back(response);
 	}
 
@@ -465,8 +446,8 @@ TEST(WebservResponseTests, LargeValidHeaderSize)
 	}
 	largeHeaders += "\r\n";
 
-	HttpRequest request(largeHeaders, server.getConfig());
-	HttpResponse response = server.handleResponse(&request);
+	HttpRequest request(largeHeaders);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 }
@@ -480,11 +461,10 @@ TEST(WebservResponseTests, OptionsMethodHandling)
 	HttpRequest request(
 		"OPTIONS / HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should return allowed methods or 405 if not supported
 	EXPECT_TRUE(response.getStatusCode() == 200 || response.getStatusCode() == 405);
@@ -499,11 +479,10 @@ TEST(WebservResponseTests, QueryStringHandling)
 	HttpRequest request(
 		"GET /cgi?param1=value1&param2=value2 HTTP/1.1\r\n"
 		"Host: MyServer3\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -522,11 +501,10 @@ TEST(WebservResponseTests, ContentLengthMismatch)
 		"Host: MyServer3\r\n"
 		"Content-Length: 1000\r\n"  // Mismatched with actual body size
 		"Connection: close\r\n\r\n" +
-		body,
-		server.getConfig()
+		body
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should handle Content-Length mismatch appropriately
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 413);
@@ -541,11 +519,10 @@ TEST(WebservResponseTests, ResponseHeadersPresent)
 	HttpRequest request(
 		"GET / HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	
@@ -563,11 +540,10 @@ TEST(WebservResponseTests, NoHostHeaderHTTP11)
 
 	HttpRequest request(
 		"GET / HTTP/1.1\r\n"
-		"Connection: close\r\n\r\n",  // Missing Host header
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// HTTP/1.1 requires Host header
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 200);
@@ -581,12 +557,11 @@ TEST(WebservResponseTests, CaseInsensitiveHeaders)
 
 	HttpRequest request(
 		"GET / HTTP/1.1\r\n"
-		"host: mainserver\r\n"          // lowercase host
-		"connection: close\r\n\r\n",    // lowercase connection
-		server.getConfig()
+		"host: mainserver\r\n"
+		"connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	// Headers should be handled case-insensitively
@@ -601,11 +576,10 @@ TEST(WebservResponseTests, PathTraversalAttempt)
 	HttpRequest request(
 		"GET /../../../etc/passwd HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should prevent path traversal attacks
 	EXPECT_TRUE(response.getStatusCode() == 404 || response.getStatusCode() == 403 || response.getStatusCode() == 400);
@@ -621,11 +595,10 @@ TEST(WebservResponseTests, MultipleConsecutiveSlashes)
 	HttpRequest request(
 		"GET ////// HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should normalize path and serve root
 	EXPECT_EQ(response.getStatusCode(), 200);
@@ -649,11 +622,10 @@ TEST(WebservResponseTests, BinaryPostData)
 		"Content-Type: application/octet-stream\r\n"
 		"Content-Length: " + std::to_string(binaryData.size()) + "\r\n"
 		"Connection: close\r\n\r\n" +
-		binaryData,
-		server.getConfig()
+		binaryData
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -672,11 +644,10 @@ TEST(WebservResponseTests, MaximumPathLength)
 	HttpRequest request(
 		"GET " + longPath + " HTTP/1.1\r\n"
 		"Host: MainServer\r\n"
-		"Connection: close\r\n\r\n",
-		server.getConfig()
+		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request);
+	HttpResponse response = server.handleResponse(&request, server.getConfig());
 
 	// Should handle long paths gracefully
 	EXPECT_TRUE(response.getStatusCode() == 404 || response.getStatusCode() == 414 || response.getStatusCode() == 400);

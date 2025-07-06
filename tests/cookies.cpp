@@ -11,11 +11,10 @@ TEST(WebservCookiesTests, BasicCookieTest)
         "GET / HTTP/1.1\r\n"
         "Host: MainServer\r\n"
         "Cookie: test_cookie=12345\r\n"
-        "Connection: close\r\n\r\n",
-        server.getConfig()
+        "Connection: close\r\n\r\n"
     );
 
-    HttpResponse response = server.handleResponse(&request);
+    HttpResponse response = server.handleResponse(&request, server.getConfig());
 
     // Verify status
     EXPECT_EQ(response.getStatusCode(), 200);
