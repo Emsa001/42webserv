@@ -125,14 +125,16 @@ int SocketHandler::run()
                 } else {
                     // Logger::debug("data from conn");
                     char buffer[4096]; // TODO: BUFSIZE
+                    // TODO: ! This assumes request can be reas non-blocking as once!
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     // TODO: error check `res`
                     _conns[it->fd].buffer.append(buffer, res);
                     shutdown(it->fd, 0); // no reads anymore
 
-                    HttpRequest request(_conns[it->fd].buffer, _servers[0].getConfig());
+                    HttpRequest request(_conns[it->fd].buffer);
+                    request.parse(_servers[0].getConfig());
                     Logger::info(request.getMethod() + " " + request.getURI());
-                    HttpResponse response = _servers.at(0).handleResponse(&request);
+                    HttpResponse response = _servers.at(0).handleResponse(&request, _servers[0].getConfig());
                     std::string responseStr = response.getResponse();
                     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
                         perror("error3: ");

@@ -28,7 +28,10 @@ std::string normalizeUri(const std::string &uri);
  * - The `headers` map is populated with parsed header fields.
  * - The `url` member is initialized with the parsed URI.
  */
-void HttpRequest::parse() {
+void HttpRequest::parse(const config_map &serverConfig) {
+    int maxHeaderSize = Config::getSafe(serverConfig, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
+    int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
+
     // 1. Locate the end of the HTTP headers (marked by "\r\n\r\n")
     size_t headerEnd = rawRequestData.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
@@ -44,7 +47,7 @@ void HttpRequest::parse() {
     // 3. Parse the request line to extract the HTTP method, URI, and version
     std::getline(headerStream, line);
     size_t totalHeaderSize = line.size();
-    if (totalHeaderSize > this->maxHeaderSize) {
+    if (totalHeaderSize > maxHeaderSize) {
         throw HttpRequestException(414);
     }
 
@@ -71,7 +74,7 @@ void HttpRequest::parse() {
             this->headers[key] = value;
         }
 
-        if (totalHeaderSize > this->maxHeaderSize) {
+        if (totalHeaderSize > maxHeaderSize) {
             throw HttpRequestException(431);
         }
     }
@@ -79,7 +82,7 @@ void HttpRequest::parse() {
     // 6. For POST and DELETE methods, assign the body and check its size against the maximum allowed
     if (this->method == "POST" || this->method == "DELETE") {
         this->body = bodyPart;
-        if (this->body.size() > this->maxBodySize) {
+        if (this->body.size() > maxBodySize) {
             throw HttpRequestException(413);
         }
         if(this->body.size() > 0 && this->headers.find("Content-Length") == this->headers.end()) {

@@ -41,6 +41,9 @@ private:
     ClientRequestState *readChunk(int fd, int index, char *buffer);
     int readBytes(int fd, int index, char *buffer);
 
+    // Determine server responsible for request (based on port and "Host" header)
+    Server &determineServer(HttpRequest &req, int port);
+
 public:
     SocketHandler(const config_array& servers);
     // SocketHandler();

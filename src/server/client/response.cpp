@@ -15,12 +15,12 @@
  * - SocketHandler will have to close or keep the connection alive based on the "Connection" header. (Can be accessed using response.getHeader("Connection")).
  * - The client timestamp update should be handled in SocketHandler, not here.
  */
-HttpResponse Server::handleResponse(HttpRequest *request) {
+HttpResponse Server::handleResponse(HttpRequest *request, const config_map &serverConfig) {
     HttpResponse response(request, this->config);
     std::string connectionHeader = "close";
 
     try {
-		request->parse();
+		request->parse(serverConfig);
 
         // Set the "Connection" header based on the request
         response.setHeader("Connection", request->getHeader("Connection") == "close" ? "close" : "keep-alive");

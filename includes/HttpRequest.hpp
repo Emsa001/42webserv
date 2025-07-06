@@ -33,28 +33,21 @@ class HttpRequest : public HttpMessage {
         std::string uri;
         std::string version;
 
-        size_t maxHeaderSize;
-        size_t maxBodySize;
-
         std::string rawRequestData;
 
     public:
-        HttpRequest(const std::string &rawData, const config_map &config)
+        HttpRequest(const std::string &rawData)
             : url(NULL), rawRequestData(rawData) {
-            maxHeaderSize = Config::getSafe(config, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
-            maxBodySize = Config::getSafe(config, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
         }
 
         ~HttpRequest() { delete url; }
 
-        void parse();
+        void parse(const config_map &serverConfig);
 
         // --- Setters ---
         void setMethod(const std::string &m) { method = m; }
         void setUri(const std::string &u) { uri = u; }
         void setVersion(const std::string &v) { version = v; }
-        void setMaxHeaderSize(size_t size) { maxHeaderSize = size; }
-        void setMaxBodySize(size_t size) { maxBodySize = size; }
 
         // --- Getters ---
         const std::string &getMethod() const { return method; }
@@ -62,8 +55,6 @@ class HttpRequest : public HttpMessage {
         const std::string &getVersion() const { return version; }
         HttpURL *getURL() const { return url; }
         const std::string &getRawRequestData() const { return rawRequestData; }
-        size_t getMaxHeaderSize() const { return maxHeaderSize; }
-        size_t getMaxBodySize() const { return maxBodySize; }
 };
 
 class HttpRequestException : public std::exception {
