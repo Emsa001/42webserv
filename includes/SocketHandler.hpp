@@ -12,8 +12,9 @@
 #endif
 
 class Server;
-
+class HttpRequest;
 struct ClientRequestState;
+
 class SocketHandler {
 private:
     std::vector<Server> _servers;
