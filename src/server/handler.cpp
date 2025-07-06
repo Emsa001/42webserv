@@ -87,19 +87,15 @@ int SocketHandler::run()
             perror("err: ");
             return -2;
         }
-        // std::cout << "poll is over " << std::endl;
-        // for (std::vector<struct pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
-        // {
-        for (int i=0; i<_pollfds.size(); ++i) {
+        // Looping backwards to prevent iterator invalidation
+        // TODO: make this work with (reverse) iterators
+        for (int i=_pollfds.size(); i>=0; --i) {
             struct pollfd *it = &_pollfds[i];
-            // int i = std::distance(_pollfds.begin(), it);
-
             struct sockaddr_in addr;
             socklen_t addrlen;
             
-            // std::cout << "revents: " << it->revents << std::endl;
             if (it->revents & POLLIN) {
-                // the event was on a socket
+                // event was on socket
                 if (i < _num_sockets) {
                     Logger::debug("New connection");
                     // accept connection and add it to the fds to watch
@@ -110,9 +106,6 @@ int SocketHandler::run()
                     if (newconn.fd < 0) {
                         Logger::error("Connection error - invalid fd");
                     }
-
-                    // Logger::debug("fd is")
-                    // std::cout << "new fd is " << newconn.fd << std::endl;
 
                     std::map<int, ClientRequestState>::iterator exstReq = _conns.find(it->fd);
                     if (exstReq != _conns.end()) {
@@ -128,7 +121,7 @@ int SocketHandler::run()
                     _conns[newconn.fd] = newReq;
                     // append to pollfds array
                     _pollfds.push_back(newconn);
-                // event on open connection
+                // event was on open connection
                 } else {
                     // Logger::debug("data from conn");
                     char buffer[4096]; // TODO: BUFSIZE
@@ -145,7 +138,7 @@ int SocketHandler::run()
                     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
                         perror("error3: ");
                     close(it->fd);
-                    _pollfds.pop_back(); // TODO: remove correct connectio
+                    _pollfds.erase(_pollfds.begin() + i);
                     if (res <= 0) {
                         Logger::info("removing");
                         perror("error2: ");
