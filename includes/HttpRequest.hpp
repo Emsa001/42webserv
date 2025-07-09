@@ -20,6 +20,7 @@ class HttpURL {
 };
 
 struct ClientRequestState {
+    int port;
     std::string buffer;
     bool headersParsed;
     size_t contentLength;

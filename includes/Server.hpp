@@ -30,7 +30,7 @@ public:
     void closeConnection(int *client_sock);
 
     // Startpoint for the server
-    HttpResponse handleResponse(HttpRequest *request, config_map const &serverConfig);
+    HttpResponse handleResponse(HttpRequest *request);
 
     // Getters
 

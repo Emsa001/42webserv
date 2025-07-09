@@ -24,6 +24,24 @@ SocketHandler::~SocketHandler()
     std::cout << "~SocketHandler" << std::endl;
 }
 
+Server & SocketHandler::determineServer(HttpRequest &req, int port) {
+    for (int i=0; i<_servers.size(); ++i) {
+        std::string const &listen = Config::getSafe(_servers[i].getConfig(), "listen", "").getString();
+        Logger::debug(listen);
+        if (stringToInt(listen) == port)
+            return _servers[i];
+    }
+    return _servers[0];
+}
+
+bool SocketHandler::portTaken(int port) {
+    for (int i=0; i<_fds_to_ports.size(); ++i) {
+        if (_fds_to_ports[i] == port)
+            return true;
+    }
+    return false;
+}
+
 bool SocketHandler::InitSockets()
 {
     struct addrinfo hints, *res;
@@ -35,40 +53,49 @@ bool SocketHandler::InitSockets()
     hints.ai_flags = AI_PASSIVE;     //
     
     std::string const host = "0.0.0.0";//Config::getSafe(_servers[0].getConfig(), "listen");
-    std::string const port = Config::getSafe(_servers[0].getConfig(), "listen");
-    int r;
-    if (r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res) < 0)
-        perror("getaddrinfo");
-    // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
-    struct pollfd newfd;
-    // std::cout << res->ai_family << std::endl;
-    newfd.events = POLLIN;
-    newfd.revents = 0;
-    newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    int sock = newfd.fd;
 
-    // // Enable TCP Keepalive
-    int optval = 1;
-    setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
-    setsockopt(newfd.fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    
-    int keep_idle = 10;     // Start checking after 10 second of inactivity
-    int keep_interval = 5;  // Send keep-alive probes every 5 second
-    int keep_count = 3;     // Disconnect after 3 failed probes
-    setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
-    setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
-    setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
+    for (int i=0; i<_servers.size(); ++i) {
+        std::string const port = Config::getSafe(_servers[i].getConfig(), "listen");
+        int port_int = stringToInt(port);
+        if (portTaken(port_int))
+            continue;
+        int r;
+        if (r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res) < 0)
+            perror("getaddrinfo");
+        // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
+        struct pollfd newfd;
+        // std::cout << res->ai_family << std::endl;
+        newfd.events = POLLIN;
+        newfd.revents = 0;
+        newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        _fds_to_ports[newfd.fd] = port_int;
+        int sock = newfd.fd;
 
-    Logger::info(" socket() = " + intToString(sock));
+        // // Enable TCP Keepalive
+        int optval = 1;
+        setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+        setsockopt(newfd.fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+        
+        int keep_idle = 10;     // Start checking after 10 second of inactivity
+        int keep_interval = 5;  // Send keep-alive probes every 5 second
+        int keep_count = 3;     // Disconnect after 3 failed probes
+        setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
+        setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
+        setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
 
-    s = bind(newfd.fd, res->ai_addr, res->ai_addrlen);
-    Logger::info(" bind() = " + intToString(s));
+        Logger::info(" socket() = " + intToString(sock));
 
-    s = listen(newfd.fd, 10);
-    Logger::info(" listen() =  " + intToString(s));
+        s = bind(newfd.fd, res->ai_addr, res->ai_addrlen);
+        Logger::info(" bind(port=" + port + ") = " + intToString(s));
 
-    _pollfds.push_back(newfd);
-    _num_sockets = 1;
+        s = listen(newfd.fd, 10);
+        Logger::info(" listen() =  " + intToString(s));
+
+        _pollfds.push_back(newfd);
+        _num_sockets = 1;
+    }
+
+
     return true;
 }
 
@@ -82,7 +109,8 @@ int SocketHandler::run()
     {
         if (poll((struct pollfd *)_pollfds.data(), _pollfds.size(), -1) < 0)
         {
-            perror("err: ");
+            Logger::error();
+            perror("err1: ");
             return -2;
         }
         // Looping backwards to prevent iterator invalidation
@@ -101,6 +129,8 @@ int SocketHandler::run()
                     newconn.events = POLLIN;
                     newconn.revents = 0;
                     newconn.fd = accept(it->fd, (sockaddr *) &addr, &addrlen);
+                    // TODO: get port (getsockname) and store in newconn
+
                     if (newconn.fd < 0) {
                         Logger::error("Connection error - invalid fd");
                     }
@@ -110,6 +140,8 @@ int SocketHandler::run()
                         // TODO: error, request exists?!
                     }
                     ClientRequestState newReq;
+                    newReq.port = _fds_to_ports[it->fd];
+                    // std::cout << newReq.port <<
                     newReq.contentLength = 0;
                     newReq.expectedSize = -1;
                     newReq.headersParsed = false;
@@ -122,20 +154,27 @@ int SocketHandler::run()
                 // event was on open connection
                 } else {
                     // Logger::debug("data from conn");
-                    char buffer[4096]; // TODO: BUFSIZE
-                    // TODO: ! This assumes request can be reas non-blocking as once!
+                    char buffer[READ_BUFFER_SIZE]; // TODO: BUFSIZE
+                    // TODO: ! This assumes request can be read non-blocking as once!
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     // TODO: error check `res`
-                    _conns[it->fd].buffer.append(buffer, res);
+                    _conns[it->fd].buffer.append(buffer, 0, res);
+                    Logger::info("extended buffer");
+                    std::cout << _conns[it->fd].buffer;
                     shutdown(it->fd, 0); // no reads anymore
 
                     HttpRequest request(_conns[it->fd].buffer);
-                    request.parse(_servers[0].getConfig());
+                    Server &s = determineServer(request, _conns[it->fd].port);
                     Logger::info(request.getMethod() + " " + request.getURI());
-                    HttpResponse response = _servers.at(0).handleResponse(&request, _servers[0].getConfig());
+                    // figure out where to direct request
+                    Logger::info(intToString(_conns[it->fd].port));
+                    // Server &s = determineServer(request, _conns[it->fd].port);
+                    HttpResponse response = s.handleResponse(&request);
                     std::string responseStr = response.getResponse();
-                    if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
+                    if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0) {
+                        Logger::error();
                         perror("error3: ");
+                    }
                     close(it->fd);
                     _pollfds.erase(_pollfds.begin() + i);
                     if (res <= 0) {

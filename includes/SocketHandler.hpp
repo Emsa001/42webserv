@@ -18,6 +18,7 @@ struct ClientRequestState;
 class SocketHandler {
 private:
     std::vector<Server> _servers;
+    std::map<int, int> _fds_to_ports;
     std::vector<pollfd> _pollfds;
     int _num_sockets;
 
@@ -48,6 +49,8 @@ private:
 
     // Determine server responsible for request (based on port and "Host" header)
     Server &determineServer(HttpRequest &req, int port);
+
+    bool portTaken(int port);
 
 public:
     SocketHandler(const config_array& servers);
