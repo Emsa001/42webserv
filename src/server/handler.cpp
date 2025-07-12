@@ -1,7 +1,7 @@
 #include "Webserv.hpp"
 #include "SocketHandler.hpp"
 
-SocketHandler::SocketHandler(const config_array& servers)
+SocketHandler::SocketHandler(const config_array& servers): _num_sockets(0)
 {
     std::cout << "SocketHandler()" << std::endl;
 
@@ -27,7 +27,6 @@ SocketHandler::~SocketHandler()
 Server & SocketHandler::determineServer(HttpRequest &req, int port) {
     for (int i=0; i<_servers.size(); ++i) {
         std::string const &listen = Config::getSafe(_servers[i].getConfig(), "listen", "").getString();
-        Logger::debug(listen);
         if (stringToInt(listen) == port)
             return _servers[i];
     }
@@ -92,8 +91,9 @@ bool SocketHandler::InitSockets()
         Logger::info(" listen() =  " + intToString(s));
 
         _pollfds.push_back(newfd);
-        _num_sockets = 1;
+        _num_sockets++;
     }
+    std::cout << "num sockets is " << _num_sockets << std::endl;
 
 
     return true;
@@ -115,7 +115,7 @@ int SocketHandler::run()
         }
         // Looping backwards to prevent iterator invalidation
         // TODO: make this work with (reverse) iterators
-        for (int i=_pollfds.size(); i>=0; --i) {
+        for (int i=_pollfds.size()-1; i>=0; --i) {
             struct pollfd *it = &_pollfds[i];
             struct sockaddr_in addr;
             socklen_t addrlen;
@@ -129,7 +129,13 @@ int SocketHandler::run()
                     newconn.events = POLLIN;
                     newconn.revents = 0;
                     newconn.fd = accept(it->fd, (sockaddr *) &addr, &addrlen);
+                    if (newconn.fd < 0) {
+                        perror("error5: ");
+                        Logger::error("accept() error");
+                        continue;
+                    }
                     // TODO: get port (getsockname) and store in newconn
+                    std::cout << newconn.fd << std::endl;
 
                     if (newconn.fd < 0) {
                         Logger::error("Connection error - invalid fd");
@@ -158,24 +164,33 @@ int SocketHandler::run()
                     // TODO: ! This assumes request can be read non-blocking as once!
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     // TODO: error check `res`
+                    if (res < 0) {
+                        Logger::error("recv() error");
+                        std::cout << it->fd << std::endl;
+                        it->revents = 0;
+                        continue;
+                    }
                     _conns[it->fd].buffer.append(buffer, 0, res);
-                    Logger::info("extended buffer");
+                    Logger::debug("extended buffer");
                     std::cout << _conns[it->fd].buffer;
                     shutdown(it->fd, 0); // no reads anymore
 
                     HttpRequest request(_conns[it->fd].buffer);
                     Server &s = determineServer(request, _conns[it->fd].port);
-                    Logger::info(request.getMethod() + " " + request.getURI());
+                    // request.parse(s.getConfig());
+
                     // figure out where to direct request
                     Logger::info(intToString(_conns[it->fd].port));
                     // Server &s = determineServer(request, _conns[it->fd].port);
                     HttpResponse response = s.handleResponse(&request);
+                    // Logger::info(request.getMethod() + " " + request.getURI());
                     std::string responseStr = response.getResponse();
                     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0) {
                         Logger::error();
                         perror("error3: ");
                     }
                     close(it->fd);
+                    _conns.erase(it->fd);
                     _pollfds.erase(_pollfds.begin() + i);
                     if (res <= 0) {
                         Logger::info("removing");
