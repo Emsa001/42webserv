@@ -4,7 +4,7 @@ server0:
     listen: "65535"
     max_client_body_size: 2147483647
     max_client_header_size: 2147483647
-    keep_alive: 2147483647
+    keep_alive: 1000
 
     location:
         path: "/"

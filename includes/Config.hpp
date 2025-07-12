@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/07/12 21:48:11 by escura           ###   ########.fr       */
+/*   Updated: 2025/07/12 21:59:53 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,10 +125,7 @@ class ConfigSchema {
         bool validateRequired(const ConfigParser *config) const;
         bool validateMap(config_map &map) const;
 
-        void allowAll(ValueType key, ValueType value) {
-            this->allowAllKey = key;
-            this->allowAllValue = value;
-        }
+        void allowAll(ValueType key, ValueType value);
 
         ValueType getAllowAllKey() const { return this->allowAllKey; }
         ValueType getAllowAllValue() const { return this->allowAllValue; }

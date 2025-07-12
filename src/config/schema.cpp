@@ -30,6 +30,12 @@ void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &n
     nestedSchemas[key] = nestedSchema;
 }
 
+void ConfigSchema::allowAll(ValueType key, ValueType value)
+{
+    this->allowAllKey = key;
+    this->allowAllValue = value;
+}
+
 ConfigSchema createSchema()
 {
     ConfigSchema rootSchema;
@@ -41,8 +47,8 @@ ConfigSchema createSchema()
     serverSchema.addEntry("host", STRING, false);
     serverSchema.addEntry("listen", STRING, true);
     serverSchema.addEntry("max_client_body_size", NUMBER(1, INT32_MAX), true);
-    serverSchema.addEntry("max_client_header_size", INT, true);
-    serverSchema.addEntry("keep_alive", INT, false);
+    serverSchema.addEntry("max_client_header_size", NUMBER(1, INT32_MAX), true);
+    serverSchema.addEntry("keep_alive", NUMBER(1, 1000), false);
 
     rootSchema.addNestedSchema("server", serverSchema);
 
