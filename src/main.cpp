@@ -22,8 +22,6 @@ int main()
     Logger::init();
 	SocketHandler sh(config.getServers());
 	sh.run();
-    // TODO: replace threads
-    // TODO: initialize servers
     Logger::destroy();
 
     return 0;

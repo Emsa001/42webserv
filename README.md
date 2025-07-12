@@ -9,8 +9,3 @@ hello world
   - [Wikipedia](https://en.wikipedia.org/wiki/HTTP)
   - [MDN Response Status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
 - [MIME](https://en.wikipedia.org/wiki/MIME)
-
-
-TODO:
-    COOKIES
-    Change threads to whatever they want from us :(

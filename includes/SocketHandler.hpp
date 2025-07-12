@@ -43,6 +43,9 @@ private:
     // void checkIdleClients();
     // void removeClient(size_t index);
 
+    // TODO: keep-alive
+    // this->keep_alive = Config::getSafe(config, "keep_alive", 30).getInt();;
+    
     // TODO: Move this to SocketHandler
     ClientRequestState *readChunk(int fd, int index, char *buffer);
     int readBytes(int fd, int index, char *buffer);

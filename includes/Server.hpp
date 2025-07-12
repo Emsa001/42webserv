@@ -18,11 +18,7 @@ private:
     const FileData createFileData(const config_map *location, HttpRequest *request) const;
 
 public:
-    Server(const config_map &config) : config(config)
-    {
-        // TODO: Handle this in SocketHandler
-        // this->keep_alive = Config::getSafe(config, "keep_alive", 30).getInt();;
-    }
+    Server(const config_map &config) : config(config) {}
     ~Server() {}
 
     const config_map *findLocation(const std::string &path);

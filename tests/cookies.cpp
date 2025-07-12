@@ -14,7 +14,7 @@ TEST(WebservCookiesTests, BasicCookieTest)
         "Connection: close\r\n\r\n"
     );
 
-    HttpResponse response = server.handleResponse(&request, server.getConfig());
+    HttpResponse response = server.handleResponse(&request);
 
     // Verify status
     EXPECT_EQ(response.getStatusCode(), 200);
@@ -40,7 +40,7 @@ TEST(WebServerCookiesTests, SettingMultipleCookies)
         "Connection: close\r\n\r\n"
     );
 
-    HttpResponse response = server.handleResponse(&request, server.getConfig());
+    HttpResponse response = server.handleResponse(&request);
 
     // Verify status
     EXPECT_EQ(response.getStatusCode(), 200);

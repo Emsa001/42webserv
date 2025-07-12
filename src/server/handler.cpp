@@ -161,7 +161,7 @@ int SocketHandler::run()
                 // event was on open connection
                 } else {
                     // Logger::debug("data from conn");
-                    char buffer[READ_BUFFER_SIZE]; // TODO: BUFSIZE
+                    char buffer[READ_BUFFER_SIZE];
                     // TODO: ! This assumes request can be read non-blocking as once!
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     // TODO: error check `res`

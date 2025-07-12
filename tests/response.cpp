@@ -32,7 +32,7 @@ TEST(WebservResponseTests, BasicGetRootMainServer)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_FALSE(response.isListing());
 	EXPECT_EQ(response.getBody().length(), stringToInt(response.getHeader("Content-Length")));
@@ -52,7 +52,7 @@ TEST(WebservResponseTests, NotFoundUnknownPath)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_FALSE(response.isListing());
 	EXPECT_EQ(response.getStatusCode(), 404);
@@ -70,7 +70,7 @@ TEST(WebservResponseTests, AutoindexPublicDirectory)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isListing());
@@ -89,7 +89,7 @@ TEST(WebservResponseTests, CgiScriptExecution)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -112,7 +112,7 @@ TEST(WebservResponseTests, RequestBodyTooLarge)
 		largeBody
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 	EXPECT_EQ(response.getStatusCode(), 413); // 413 Payload Too Large
 }
 
@@ -129,7 +129,7 @@ TEST(WebservResponseTests, RequestHeaderTooLarge)
 	largeHeader += "\r\n";
 
 	HttpRequest request(largeHeader);
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 431); // 431 Request Header Fields Too Large
 }
@@ -147,7 +147,7 @@ TEST(WebservResponseTests, MethodNotAllowed)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
@@ -167,7 +167,7 @@ TEST(WebservResponseTests, IndexLocation)
 			"Connection: close\r\n\r\n";
 	
 		HttpRequest request(requestStr);
-		HttpResponse response = server.handleResponse(&request, server.getConfig());
+		HttpResponse response = server.handleResponse(&request);
 
 		const FileData fileData = response.getFileData();
 		const config_map *location = server.findLocation(request.getURL()->getPath());
@@ -192,7 +192,7 @@ TEST(WebservResponseTests, CustomErrorPage404)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 404);
 	// Should use custom error page defined in MyServer1 config
@@ -210,7 +210,7 @@ TEST(WebservResponseTests, DeleteMethodCgiServer)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -233,7 +233,7 @@ TEST(WebservResponseTests, PostWithValidBodySize)
 		validBody
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -255,7 +255,7 @@ TEST(WebservResponseTests, SmallBodyLimitServer)
 		largeBody
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 413); // Payload Too Large
 }
@@ -272,7 +272,7 @@ TEST(WebservResponseTests, KeepAliveConnection)
 		"Connection: keep-alive\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.getHeader("Connection") == "keep-alive");
@@ -290,7 +290,7 @@ TEST(WebservResponseTests, SecretPathAccess)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	// Should serve hidden.html as per config
@@ -308,7 +308,7 @@ TEST(WebservResponseTests, ContentTypeHeaderValidation)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_FALSE(response.getHeader("Content-Type").empty());
@@ -328,7 +328,7 @@ TEST(WebservResponseTests, EmptyRequestBody)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -346,7 +346,7 @@ TEST(WebservResponseTests, InvalidHTTPMethod)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
@@ -366,7 +366,7 @@ TEST(WebservResponseTests, MissingContentLengthForPost)
 		body
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should handle missing Content-Length gracefully
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 411);
@@ -383,7 +383,7 @@ TEST(WebservResponseTests, HTTPVersionSupport)
 		"Host: MainServer\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	// Should handle HTTP/1.0 requests
@@ -401,7 +401,7 @@ TEST(WebservResponseTests, DirectoryWithoutTrailingSlash)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should either redirect to /public/ or serve directory listing
 	EXPECT_TRUE(response.getStatusCode() == 200 || response.getStatusCode() == 301 || response.getStatusCode() == 302);
@@ -423,7 +423,7 @@ TEST(WebservResponseTests, ConcurrentRequestHandling)
 			"Connection: close\r\n\r\n"
 		);
 
-		HttpResponse response = server.handleResponse(&request, server.getConfig());
+		HttpResponse response = server.handleResponse(&request);
 		responses.push_back(response);
 	}
 
@@ -447,7 +447,7 @@ TEST(WebservResponseTests, LargeValidHeaderSize)
 	largeHeaders += "\r\n";
 
 	HttpRequest request(largeHeaders);
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 }
@@ -464,7 +464,7 @@ TEST(WebservResponseTests, OptionsMethodHandling)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should return allowed methods or 405 if not supported
 	EXPECT_TRUE(response.getStatusCode() == 200 || response.getStatusCode() == 405);
@@ -482,7 +482,7 @@ TEST(WebservResponseTests, QueryStringHandling)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -504,7 +504,7 @@ TEST(WebservResponseTests, ContentLengthMismatch)
 		body
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should handle Content-Length mismatch appropriately
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 413);
@@ -522,7 +522,7 @@ TEST(WebservResponseTests, ResponseHeadersPresent)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	
@@ -543,7 +543,7 @@ TEST(WebservResponseTests, NoHostHeaderHTTP11)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// HTTP/1.1 requires Host header
 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 200);
@@ -561,7 +561,7 @@ TEST(WebservResponseTests, CaseInsensitiveHeaders)
 		"connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	// Headers should be handled case-insensitively
@@ -579,7 +579,7 @@ TEST(WebservResponseTests, PathTraversalAttempt)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should prevent path traversal attacks
 	EXPECT_TRUE(response.getStatusCode() == 404 || response.getStatusCode() == 403 || response.getStatusCode() == 400);
@@ -598,7 +598,7 @@ TEST(WebservResponseTests, MultipleConsecutiveSlashes)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should normalize path and serve root
 	EXPECT_EQ(response.getStatusCode(), 200);
@@ -625,7 +625,7 @@ TEST(WebservResponseTests, BinaryPostData)
 		binaryData
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	EXPECT_EQ(response.getStatusCode(), 200);
 	EXPECT_TRUE(response.isCgi());
@@ -647,7 +647,7 @@ TEST(WebservResponseTests, MaximumPathLength)
 		"Connection: close\r\n\r\n"
 	);
 
-	HttpResponse response = server.handleResponse(&request, server.getConfig());
+	HttpResponse response = server.handleResponse(&request);
 
 	// Should handle long paths gracefully
 	EXPECT_TRUE(response.getStatusCode() == 404 || response.getStatusCode() == 414 || response.getStatusCode() == 400);
