@@ -4,11 +4,12 @@
 #include "Webserv.hpp"
 
 #define LOG_ENABLED true
-#define LOG_LEVEL 0 // DEBUG
-
+#define LOG_LEVEL 1 // DEBUG
 
 class Logger {
     private:
+        static int _lvl;
+
         static void log(const std::string& level, const std::string& color, const std::string& message) {
             static std::map<std::string, int> levelMapping;
             levelMapping["DEBUG"]        = 0;
@@ -32,6 +33,9 @@ class Logger {
         }
 
     public:
+        static void setLevel(int lvl) {
+            _lvl = lvl;
+        }
 
         static void init(){
         }
@@ -79,6 +83,8 @@ class Logger {
             log("IDLE", ORANGE300, "Client " + intToString(clientId) + " is idle.");
         }
 };
+
+// int Logger::_lvl = 0;
 
 #endif
 

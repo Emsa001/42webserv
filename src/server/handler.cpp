@@ -3,7 +3,7 @@
 
 SocketHandler::SocketHandler(const config_array& servers): _num_sockets(0)
 {
-    std::cout << "SocketHandler()" << std::endl;
+    Logger::debug("Initialializing SocketHandler");
 
     // init servers for request handling
     for (config_array::const_iterator it = servers.begin(); it != servers.end(); ++it) {
@@ -21,7 +21,7 @@ SocketHandler::SocketHandler(const config_array& servers): _num_sockets(0)
 
 SocketHandler::~SocketHandler()
 {
-    std::cout << "~SocketHandler" << std::endl;
+    Logger::debug("Deconstructing SocketHandler");
 }
 
 Server & SocketHandler::determineServer(HttpRequest &req, int port) {
@@ -94,7 +94,6 @@ bool SocketHandler::InitSockets()
         _pollfds.push_back(newfd);
         _num_sockets++;
     }
-    std::cout << "num sockets is " << _num_sockets << std::endl;
 
 
     return true;
@@ -136,7 +135,7 @@ int SocketHandler::run()
                         continue;
                     }
                     // TODO: get port (getsockname) and store in newconn
-                    std::cout << newconn.fd << std::endl;
+                    // std::cout << newconn.fd << std::endl;
 
                     if (newconn.fd < 0) {
                         Logger::error("Connection error - invalid fd");
@@ -173,7 +172,6 @@ int SocketHandler::run()
                     }
                     _conns[it->fd].buffer.append(buffer, 0, res);
                     Logger::debug("extended buffer");
-                    std::cout << _conns[it->fd].buffer;
                     shutdown(it->fd, 0); // no reads anymore
 
                     HttpRequest request(_conns[it->fd].buffer);
@@ -181,7 +179,7 @@ int SocketHandler::run()
                     // request.parse(s.getConfig());
 
                     // figure out where to direct request
-                    Logger::info(intToString(_conns[it->fd].port));
+                    // Logger::info(intToString(_conns[it->fd].port));
                     // Server &s = determineServer(request, _conns[it->fd].port);
                     HttpResponse response = s.handleResponse(&request);
                     // Logger::info(request.getMethod() + " " + request.getURI());

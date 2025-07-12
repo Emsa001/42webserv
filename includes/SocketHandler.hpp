@@ -57,7 +57,6 @@ private:
 
 public:
     SocketHandler(const config_array& servers);
-    // SocketHandler();
     ~SocketHandler();
 
     bool InitSockets();
