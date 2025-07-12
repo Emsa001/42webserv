@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/07/12 14:46:04 by escura           ###   ########.fr       */
+/*   Updated: 2025/07/12 21:48:11 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,14 @@ class ConfigParser;
 
 enum ValueType { INT, BOOL, STRING, ARRAY, MAP, ANY };
 enum blockKind { SERVER, LOCATION, ERRORS, UNKNOWN };
+
+struct NUMBER
+{
+    int min;
+    int max;
+
+    NUMBER(int min, int max) : min(min), max(max) { }
+};
 
 typedef std::map<std::string, ConfigValue> config_map;
 typedef std::vector<ConfigValue> config_array;
@@ -90,6 +98,8 @@ class ConfigSchema {
         struct SchemaEntry {
             ValueType type;
             bool required;
+            int max;
+            int min;
         };
 
         typedef std::map<std::string, SchemaEntry> SchemaMap;
@@ -107,9 +117,11 @@ class ConfigSchema {
         ~ConfigSchema() {};
 
         void addEntry(const std::string &key, ValueType type, bool required);
+        void addEntry(const std::string &key, NUMBER type, bool required);
+
         
         void addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema);
-        bool validate(const std::string &key, ValueType type, int blockKind) const;
+        void validate(const std::string &key, ValueType type, const::std::string &value, int blockKind) const;
         bool validateRequired(const ConfigParser *config) const;
         bool validateMap(config_map &map) const;
 

@@ -1,9 +1,11 @@
 #include "Webserv.hpp"
 
-bool ConfigSchema::validate(const std::string &key, ValueType type, int blockKind) const {
+void ConfigSchema::validate(const std::string &key, ValueType type, const std::string &value, int blockKind) const {
     const ConfigSchema *validSchema = this;
 
-    if(ConfigParser::isReserved(key)) return true;
+    if(ConfigParser::isReserved(key)){
+        throw std::runtime_error("Key '" + key + "' is reserved and cannot be used");
+    }
 
     switch(blockKind){
         case SERVER:
@@ -31,17 +33,26 @@ bool ConfigSchema::validate(const std::string &key, ValueType type, int blockKin
        validSchema->allowAllValue != static_cast<ValueType>(-1) &&
        validSchema->allowAllKey == keyType && 
        validSchema->allowAllValue == type){
-        return true;
+        return ;
     }
 
     if (validSchema->schema.find(key) == validSchema->schema.end()) {
-        return false;
+        throw std::runtime_error("Key '" + key + "' is not allowed in this context");
     }
     if (validSchema->schema.find(key)->second.type != type) {
-        return false;
+        throw std::runtime_error("Key '" + key + "' is not of the correct type");
     }
 
-    return true;
+    int min = validSchema->schema.find(key)->second.min;
+    int max = validSchema->schema.find(key)->second.max;
+
+    if(type == INT && min != -1 && max != -1) {
+        int intValue = ConfigValue::detectType(value, false).getInt();
+        if(intValue < min || intValue > max) {
+            throw std::runtime_error("Value for key '" + key + "' (" + value + ") is out of range (" + intToString(min) + " - " + intToString(max) + ")");
+        }
+    }
+
 }
 
 bool ConfigSchema::validateMap(config_map &map) const {

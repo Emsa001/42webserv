@@ -117,8 +117,10 @@ bool ConfigParser::validateAndSetKey(char quote, const std::string &key, const s
 
     int blockKind = this->block ? this->block->at("blockKind").getInt() : -1;
 
-    if(!this->schema.validate(key, ConfigValue::detectType(value, forceString).getType(), blockKind)){
-        throw ParseError(this->ln, "Key '" + key + "' is not allowed in this context or it's not of the correct type");
+    try{
+        this->schema.validate(key, ConfigValue::detectType(value, forceString).getType(), value, blockKind);
+    }catch (const std::runtime_error &e) {
+        throw ParseError(this->ln, e.what());
     }
 
     return setKey(key, value, forceString);

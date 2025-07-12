@@ -1,28 +1,46 @@
 #include "Webserv.hpp"
 
-void ConfigSchema::addEntry(const std::string &key, ValueType type, bool required) {
+
+void ConfigSchema::addEntry(const std::string &key, ValueType type, bool required)
+{
     SchemaEntry entry;
     entry.type = type;
     entry.required = required;
 
+    entry.max = -1; // Default value for max
+    entry.min = -1; // Default value for min
+
     schema[key] = entry;
 }
 
-void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema) {
+void ConfigSchema::addEntry(const std::string &key, NUMBER type, bool required)
+{
+    SchemaEntry entry;
+    entry.type = INT;
+    entry.required = required;
+
+    entry.max = type.max;
+    entry.min = type.min;
+
+    schema[key] = entry;
+}
+
+void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema)
+{
     nestedSchemas[key] = nestedSchema;
 }
 
-ConfigSchema createSchema() {
+ConfigSchema createSchema()
+{
     ConfigSchema rootSchema;
     rootSchema.addEntry("log_format", STRING, false);
-
 
     // Server Schema
     ConfigSchema serverSchema;
     serverSchema.addEntry("server_name", STRING, true);
     serverSchema.addEntry("host", STRING, false);
     serverSchema.addEntry("listen", STRING, true);
-    serverSchema.addEntry("max_client_body_size", INT, true);
+    serverSchema.addEntry("max_client_body_size", NUMBER(1, INT32_MAX), true);
     serverSchema.addEntry("max_client_header_size", INT, true);
     serverSchema.addEntry("keep_alive", INT, false);
 
@@ -51,7 +69,6 @@ ConfigSchema createSchema() {
 
     return rootSchema;
 }
-
 
 /*
 

@@ -165,7 +165,10 @@ ConfigValue ConfigValue::detectType(const std::string &value, bool forceString)
         return ConfigValue(false);
 
     bool isNumber = true;
-    for (size_t i = 0; i < value.size(); i++)
+    size_t start = 0;
+    if (!value.empty() && value[0] == '-')
+        start = 1;
+    for (size_t i = start; i < value.size(); i++)
     {
         if (!isdigit(value[i]))
         {
@@ -173,8 +176,10 @@ ConfigValue ConfigValue::detectType(const std::string &value, bool forceString)
             break;
         }
     }
+    if (start == 1 && value.size() == 1)
+        isNumber = false;
     if (isNumber)
-        return ConfigValue(atoi(value.c_str()));
+        return ConfigValue(stringToInt(value));
 
     return ConfigValue(value);
 }

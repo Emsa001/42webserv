@@ -25,12 +25,16 @@ void trim(std::string &s) {
 
 std::string intToString(int i) {
     std::stringstream ss;
+    if(!ss.good())
+        throw std::invalid_argument("Invalid integer");
     ss << i;
     return ss.str();
 }
 
 int stringToInt(const std::string &s) {
     std::stringstream ss(s);
+    if(!ss.good())
+        throw std::invalid_argument("Invalid integer string: " + s);
     int i;
     ss >> i;
     return i;

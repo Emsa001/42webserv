@@ -13,16 +13,23 @@ void* startServer(void* arg) {
 
 int main()
 {
-    Config &config = Config::instance();
-    config.parse("conf/default.yml");
+    try {
+        Config &config = Config::instance();
+        config.parse("conf/default.yml");
 
-    Server server(config.getServers()[0].getMap());
-    
+        Server server(config.getServers()[0].getMap());
+        
+        int max_client_body_size = Config::getSafe(server.getConfig(), "max_client_body_size", ConfigValue(1000000)).getInt();
+        std::cout << "Max client body size: " << max_client_body_size << std::endl;
 
-    Logger::init();
-	SocketHandler sh(config.getServers());
-	sh.run();
-    Logger::destroy();
+        // Logger::init();
+        // SocketHandler sh(config.getServers());
+        // sh.run();
+        // Logger::destroy();
 
-    return 0;
+        return 0;
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 }
