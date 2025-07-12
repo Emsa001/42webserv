@@ -1,0 +1,24 @@
+# Duplicate listen ports - potential conflict
+server0:
+    server_name: "Server1"
+    listen: "8080"
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/server1/"
+        methods: "GET"
+
+server1:
+    server_name: "Server2"
+    listen: "8080"
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/server2/"
+        methods: "GET"

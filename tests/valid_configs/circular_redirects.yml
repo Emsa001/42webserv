@@ -1,0 +1,22 @@
+# Circular redirects configuration
+server0:
+    server_name: "CircularRedirectServer"
+    listen: "8080"
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/redirect1"
+        redirect: "http://localhost:8080/redirect2"
+        methods: "GET"
+    
+    location:
+        path: "/redirect2"
+        redirect: "http://localhost:8080/redirect3"
+        methods: "GET"
+    
+    location:
+        path: "/redirect3"
+        redirect: "http://localhost:8080/redirect1"
+        methods: "GET"

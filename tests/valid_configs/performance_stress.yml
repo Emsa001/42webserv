@@ -1,0 +1,181 @@
+# Performance stress test configuration with many servers and locations
+log_format: "[server] | [date] [time] | [method] [uri] | [status]"
+
+server0:
+    server_name: "LoadBalancer1"
+    listen: "8080"
+    max_client_body_size: 8192
+    max_client_header_size: 2048
+    keep_alive: 60
+
+    location:
+        path: "/"
+        root: "/lb1/"
+        methods: "GET"
+    location:
+        path: "/api/v1"
+        root: "/api/v1/"
+        methods: "GET POST PUT DELETE"
+        cgi: true
+    location:
+        path: "/api/v2"
+        root: "/api/v2/"
+        methods: "GET POST PUT DELETE"
+        cgi: true
+    location:
+        path: "/static"
+        root: "/static/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/uploads"
+        root: "/uploads/"
+        methods: "POST"
+        upload_path: "/tmp/uploads/"
+    location:
+        path: "/admin"
+        root: "/admin/"
+        methods: "GET POST"
+        exact: true
+    location:
+        path: "/docs"
+        root: "/docs/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/health"
+        root: "/health/"
+        methods: "GET"
+    location:
+        path: "/metrics"
+        root: "/metrics/"
+        methods: "GET"
+    location:
+        path: "/logs"
+        root: "/logs/"
+        methods: "GET"
+        autoindex: true
+
+    errors:
+        404: "errors/404.html"
+        500: "errors/500.html"
+        503: "errors/503.html"
+
+server1:
+    server_name: "LoadBalancer2"
+    listen: "8081"
+    max_client_body_size: 8192
+    max_client_header_size: 2048
+    keep_alive: 60
+
+    location:
+        path: "/"
+        root: "/lb2/"
+        methods: "GET"
+    location:
+        path: "/api/v1"
+        root: "/api/v1/"
+        methods: "GET POST PUT DELETE"
+        cgi: true
+    location:
+        path: "/api/v2"
+        root: "/api/v2/"
+        methods: "GET POST PUT DELETE"
+        cgi: true
+    location:
+        path: "/static"
+        root: "/static/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/uploads"
+        root: "/uploads/"
+        methods: "POST"
+        upload_path: "/tmp/uploads/"
+
+    errors:
+        404: "errors/404.html"
+        500: "errors/500.html"
+
+server2:
+    server_name: "CDN"
+    listen: "8082"
+    max_client_body_size: 16384
+    max_client_header_size: 4096
+    keep_alive: 120
+
+    location:
+        path: "/"
+        root: "/cdn/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/images"
+        root: "/cdn/images/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/videos"
+        root: "/cdn/videos/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/assets"
+        root: "/cdn/assets/"
+        methods: "GET"
+        autoindex: true
+
+server3:
+    server_name: "CGIServer"
+    listen: "8083"
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/cgi/"
+        methods: "GET"
+    location:
+        path: "/cgi-bin"
+        root: "/cgi-bin/"
+        methods: "GET POST"
+        cgi: true
+    location:
+        path: "/scripts"
+        root: "/scripts/"
+        methods: "GET POST"
+        cgi: true
+    location:
+        path: "/forms"
+        root: "/forms/"
+        methods: "GET POST PUT"
+        cgi: true
+
+server4:
+    server_name: "FileServer"
+    listen: "8084"
+    max_client_body_size: 32768
+    max_client_header_size: 1024
+    keep_alive: 45
+
+    location:
+        path: "/"
+        root: "/files/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/downloads"
+        root: "/downloads/"
+        methods: "GET"
+        autoindex: true
+    location:
+        path: "/shared"
+        root: "/shared/"
+        methods: "GET POST PUT DELETE"
+        autoindex: true
+    location:
+        path: "/backup"
+        root: "/backup/"
+        methods: "GET"
+        autoindex: true

@@ -60,7 +60,7 @@ config_map ConfigParser::cleanTemp(config_map *temp) {
             it->second = ConfigValue(temp);
         }
 
-        if (ConfigParser::isReserved(it->first)) temp->erase(it++);
+        if (ConfigParser::isReserved(it->first) && it->first != "blockKind") temp->erase(it++);
         else it++;
     }
 

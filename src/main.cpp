@@ -15,6 +15,7 @@ int main()
 {
     Config &config = Config::instance();
     config.parse("conf/default.yml");
+
     Server server(config.getServers()[0].getMap());
     
 

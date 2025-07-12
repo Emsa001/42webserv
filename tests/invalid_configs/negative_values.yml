@@ -1,0 +1,12 @@
+# Negative values test - should be invalid
+server0:
+    server_name: "NegativeValuesServer"
+    listen: "8080"
+    max_client_body_size: -1
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/negative/"
+        methods: "GET"

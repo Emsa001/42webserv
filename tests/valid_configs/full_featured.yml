@@ -1,0 +1,27 @@
+# Configuration with all optional fields
+log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
+
+server0:
+    server_name: "FullFeaturedServer"
+    listen: "8080"
+    host: "localhost"
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/full/"
+        methods: "GET POST PUT DELETE"
+        index: "index.html"
+        autoindex: true
+        exact: false
+        cgi: false
+        upload_path: "/uploads/"
+        redirect: "http://localhost:8080/home"
+    
+    errors:
+        404: "404.html"
+        500: "500.html"
+        403: "403.html"
+        400: "400.html"

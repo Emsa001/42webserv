@@ -99,6 +99,11 @@ bool ConfigSchema::validateRequired(const ConfigParser *config) const {
     config_map root = config->getRoot();
     config_array servers = config->getServers();
 
+    if(servers.empty()) {
+        std::cerr << "Error: No servers found in config" << std::endl;
+        return false;
+    }
+
     SchemaMap::const_iterator it;
     for (it = schema.begin(); it != schema.end(); ++it) {
         if(root.find(it->first) != root.end()) continue;

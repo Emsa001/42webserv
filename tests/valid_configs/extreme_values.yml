@@ -1,0 +1,15 @@
+# Extreme values configuration - testing limits
+server0:
+    server_name: "ExtremeValuesServer"
+    listen: "65535"
+    max_client_body_size: 2147483647
+    max_client_header_size: 2147483647
+    keep_alive: 2147483647
+
+    location:
+        path: "/"
+        root: "/extreme/"
+        methods: "GET POST PUT DELETE PATCH HEAD OPTIONS TRACE CONNECT"
+        autoindex: true
+        exact: true
+        cgi: true

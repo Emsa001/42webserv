@@ -37,11 +37,10 @@ TEST(WebServerCookiesTests, SettingMultipleCookies)
     HttpRequest request(
         "GET /cookies/test.py HTTP/1.1\r\n"
         "Host: MyServer2\r\n"
-        "Connection: close\r\n\r\n",
-        server.getConfig()
+        "Connection: close\r\n\r\n"
     );
 
-    HttpResponse response = server.handleResponse(&request);
+    HttpResponse response = server.handleResponse(&request, server.getConfig());
 
     // Verify status
     EXPECT_EQ(response.getStatusCode(), 200);

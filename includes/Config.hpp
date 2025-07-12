@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/06/22 22:00:10 by escura           ###   ########.fr       */
+/*   Updated: 2025/07/12 14:46:04 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,18 +190,18 @@ class ConfigParser
 
         config_map getRoot() const { return root; }
         config_array getServers() const {
-            config_array servers = config_array();
+            config_array servers;
 
-            config_map::const_iterator it = this->root.begin();
-            while (it != this->root.end()) {
-                if (it->second.getMap().count("listen")) {
+            for (config_map::const_iterator it = this->root.begin(); it != this->root.end(); ++it) {
+                const config_map &m = it->second.getMap();
+                config_map::const_iterator bk = m.find("blockKind");
+                if (bk != m.end() && bk->second.getInt() == SERVER) {
                     servers.push_back(it->second);
                 }
-                it++;
             }
 
             return servers;
-        };
+        }
 
     
     class ParseError : public std::exception {
