@@ -25,7 +25,8 @@ SocketHandler::~SocketHandler()
 }
 
 Server & SocketHandler::determineServer(HttpRequest &req, int port) {
-    for (int i=0; i<_servers.size(); ++i) {
+    (void) req;
+    for (size_t i=0; i<_servers.size(); ++i) {
         std::string const &listen = Config::getSafe(_servers[i].getConfig(), "listen", "").getString();
         if (stringToInt(listen) == port)
             return _servers[i];
@@ -34,7 +35,7 @@ Server & SocketHandler::determineServer(HttpRequest &req, int port) {
 }
 
 bool SocketHandler::portTaken(int port) {
-    for (int i=0; i<_fds_to_ports.size(); ++i) {
+    for (size_t i=0; i<_fds_to_ports.size(); ++i) {
         if (_fds_to_ports[i] == port)
             return true;
     }
@@ -53,13 +54,13 @@ bool SocketHandler::InitSockets()
     
     std::string const host = "0.0.0.0";//Config::getSafe(_servers[0].getConfig(), "listen");
 
-    for (int i=0; i<_servers.size(); ++i) {
+    for (size_t i=0; i<_servers.size(); ++i) {
         std::string const port = Config::getSafe(_servers[i].getConfig(), "listen");
         int port_int = stringToInt(port);
         if (portTaken(port_int))
             continue;
         int r;
-        if (r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res) < 0)
+        if ((r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res)) < 0)
             perror("getaddrinfo");
         // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
         struct pollfd newfd;

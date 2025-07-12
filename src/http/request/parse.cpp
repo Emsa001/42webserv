@@ -45,7 +45,7 @@ void HttpRequest::parse(const config_map &serverConfig) {
     // 3. Parse the request line to extract the HTTP method, URI, and version
     std::getline(headerStream, line);
     size_t totalHeaderSize = line.size();
-    if (totalHeaderSize > maxHeaderSize) {
+    if (totalHeaderSize > (size_t) maxHeaderSize) {
         throw HttpRequestException(414);
     }
 
@@ -72,7 +72,7 @@ void HttpRequest::parse(const config_map &serverConfig) {
             this->setHeader(key, value);
         }
 
-        if (totalHeaderSize > maxHeaderSize) {
+        if (totalHeaderSize > (size_t) maxHeaderSize) {
             throw HttpRequestException(431);
         }
     }
@@ -80,14 +80,14 @@ void HttpRequest::parse(const config_map &serverConfig) {
     // 6. For POST and DELETE methods, assign the body and check its size against the maximum allowed
     if (this->method == "POST" || this->method == "DELETE") {
         this->body = bodyPart;
-        if (this->body.size() > maxBodySize) {
+        if (this->body.size() > (size_t) maxBodySize) {
             throw HttpRequestException(413);
         }
         if(this->body.size() > 0 && this->getHeader("Content-Length") == "") {
             throw HttpRequestException(400); // Content-Length header is required for POST/DELETE with body
         }
         else if (this->getHeader("Content-Length") != "") {
-            int contentLength = stringToInt(this->getHeader("Content-Length"));
+            size_t contentLength = stringToInt(this->getHeader("Content-Length"));
             if (contentLength != this->body.size()) {
                 throw HttpRequestException(400); // Content-Length mismatch
             }
