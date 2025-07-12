@@ -5,11 +5,11 @@ TEST(WebservCookiesTests, BasicCookieTest)
 {
     Config &config = Config::instance();
     config.parse("conf/default.yml");
-    Server server(config.getServers()[0].getMap());
+    Server server(config.getServers()[2].getMap());
 
     HttpRequest request(
         "GET /cookies HTTP/1.1\r\n"
-        "Host: MainServer\r\n"
+        "Host: MyServer2\r\n"
         "Cookie: test_cookie=12345\r\n"
         "Connection: close\r\n\r\n"
     );
@@ -32,11 +32,11 @@ TEST(WebServerCookiesTests, SettingMultipleCookies)
 {
     Config &config = Config::instance();
     config.parse("conf/default.yml");
-    Server server(config.getServers()[0].getMap());
+    Server server(config.getServers()[2].getMap());
 
     HttpRequest request(
         "GET /cookies/test.py HTTP/1.1\r\n"
-        "Host: MainServer\r\n"
+        "Host: MyServer2\r\n"
         "Connection: close\r\n\r\n",
         server.getConfig()
     );

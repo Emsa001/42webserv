@@ -43,13 +43,6 @@ server0:
         root: "/mainserver/"
         methods: "GET"
 
-    location:
-        path: "/cookies"
-        root: "/myserver2/cgi/"
-        index: "cookies.py"
-        cgi: true
-        methods: "GET"
-
 server1:
     server_name: "MyServer1"
     listen: "8080"
