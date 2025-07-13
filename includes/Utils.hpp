@@ -8,6 +8,7 @@ std::string intToString(int i);
 int stringToInt(const std::string &s);
 StringVec split(const std::string &s, char delim);
 StringVec splitFirst(const std::string &s, char delim);
+std::string toLower(const std::string &str);
 
 // File operations
 std::string readFileContent(const std::string &filePath);

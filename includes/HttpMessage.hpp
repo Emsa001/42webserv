@@ -16,11 +16,13 @@ class HttpMessage {
 
         // --- Headers ---
         void setHeader(const std::string &key, const std::string &value) { 
-            headers.insert(std::make_pair(key, value)); 
+            std::string mkey = toLower(key);
+            headers.insert(std::make_pair(mkey, value)); 
         }
         const StringMultiMap &getHeaders() const { return headers; }
         std::string getHeader(const std::string &key) const {
-            StringMultiMap::const_iterator it = headers.find(key);
+            std::string mkey = toLower(key);
+            StringMultiMap::const_iterator it = headers.find(mkey);
             return (it != headers.end()) ? it->second : "";
         }
 

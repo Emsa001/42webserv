@@ -22,7 +22,7 @@ TEST(WebservCookiesTests, BasicCookieTest)
 
     // Ensure the cookie did not change (no Set-Cookie in response)
     std::string raw = response.getResponse();
-    EXPECT_TRUE(raw.find("Set-Cookie: test_cookie=12345;") != std::string::npos);
+    EXPECT_TRUE(raw.find("set-cookie: test_cookie=12345;") != std::string::npos);
 
     // Optionally, check if body contains some static content (e.g., index.html)
     EXPECT_TRUE(raw.find("<html") != std::string::npos || raw.find("<!DOCTYPE") != std::string::npos);
@@ -48,9 +48,9 @@ TEST(WebServerCookiesTests, SettingMultipleCookies)
 
     // Ensure the cookie did not change (no Set-Cookie in response)
     std::string raw = response.getResponse();
-    EXPECT_TRUE(raw.find("Set-Cookie: test_cookie=123;") != std::string::npos);
-    EXPECT_TRUE(raw.find("Set-Cookie: sessionid=abc123;") != std::string::npos);
-    EXPECT_TRUE(raw.find("Set-Cookie: user_pref=dark_mode;") != std::string::npos);
+    EXPECT_TRUE(raw.find("set-cookie: test_cookie=123;") != std::string::npos);
+    EXPECT_TRUE(raw.find("set-cookie: sessionid=abc123;") != std::string::npos);
+    EXPECT_TRUE(raw.find("set-cookie: user_pref=dark_mode;") != std::string::npos);
 
 
     // Optionally, check if body contains some static content (e.g., index.html)

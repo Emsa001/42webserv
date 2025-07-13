@@ -85,3 +85,11 @@ std::string trimChar(const std::string &str, char c) {
     }
     return trimmed;
 }
+
+std::string toLower(const std::string &str) {
+    std::string newstr = "";
+    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+        newstr += (std::tolower(*it));
+    }
+    return newstr;
+}
