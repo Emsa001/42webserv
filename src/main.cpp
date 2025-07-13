@@ -15,7 +15,7 @@ int main()
 {
     try {
         Config &config = Config::instance();
-        config.parse("conf/virtual_hosts_example.yml");
+        config.parse("conf/default.yml");
         
         Logger::init();
         SocketHandler sh(config.getServers());

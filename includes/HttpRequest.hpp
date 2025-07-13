@@ -27,9 +27,11 @@ class HttpRequest : public HttpMessage {
         std::string version;
         std::string port;
 
+        
         std::string rawRequestData;
         bool headersParsed;
         std::string::size_type headerEnd;
+        int content_length;
 
         std::string normalizeUri(const std::string &uri);
 
@@ -37,7 +39,7 @@ class HttpRequest : public HttpMessage {
     public:
         HttpRequest(const std::string &rawData="")
             : url(NULL), rawRequestData(rawData), headersParsed(false),
-            headerEnd(std::string::npos) {
+            headerEnd(std::string::npos), content_length(-1) {
         }
 
         ~HttpRequest() { delete url; }
@@ -45,7 +47,7 @@ class HttpRequest : public HttpMessage {
         void parseHeaders(const config_map &serverConfig);
         void parse(const config_map &serverConfig);
 
-        void feed(const std::string & addition, const config_map &serverConfig);
+        bool feed(const std::string & addition, const config_map &serverConfig);
 
         // --- Setters ---
         void setMethod(const std::string &m) { method = m; }

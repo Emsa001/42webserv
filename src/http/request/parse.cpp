@@ -49,6 +49,15 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
             throw HttpRequestException(431);
         }
     }
+
+    if (getHeader("Content-Length").empty())
+        content_length = -1;
+    else {
+        Logger::debug("clen is " + getHeader("Content-Length"));
+        content_length = stringToInt(getHeader("Content-Length"));
+        Logger::debug("clen is " + intToString(content_length));
+        Logger::debug("done parsing headers");
+    }
     headersParsed = true;
 }
 
@@ -109,20 +118,34 @@ void HttpRequest::parse(const config_map &serverConfig) {
 
 // Feed bytes from the buffer into the request
 // When the headers are complete, parse the headers
-void HttpRequest::feed(const std::string & addition, const config_map &serverConfig) {
+bool HttpRequest::feed(const std::string & addition, const config_map &serverConfig) {
     rawRequestData.append(addition);
 
     std::string::size_type res = rawRequestData.find("\r\n\r\n"); // TODO: maybe don't read all of it again?
     bool headersEnded = res != std::string::npos;
-    if (headersEnded) {
+    if (!headersParsed && headersEnded)
         parseHeaders(serverConfig);
-    } else {
+    if (headersParsed) {
         if (addition.size() > 10000) { // TODO: max_header_size ?
             // lots of bytes read, but still no body -> Bad Request
             throw HttpRequestException(400);
         }
+        std::string bodyPart = rawRequestData.substr(headerEnd + 4);
+        std::cout << bodyPart << std::endl;
+
+        if (getMethod() == "GET")
+            return true;
         // just wait for it
+        if (content_length >= 0 && bodyPart.size() >= (size_t) stringToInt(getHeader("Content-Length")))
+            return true;
+
+        if (bodyPart.find("\r\n\r\n") != std::string::npos) {
+            Logger::debug("found end of request");
+            return true;
+        }
     }
+    Logger::debug("reading but not done");
+    return false;
 }
 
 std::string HttpRequest::normalizeUri(const std::string &uri) {

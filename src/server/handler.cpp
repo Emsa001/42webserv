@@ -187,6 +187,8 @@ int SocketHandler::run()
                     _pollfds.push_back(newconn);
                 // event was on open connection
                 } else {
+                    it->revents = 0;
+                    
                     // Logger::debug("data from conn");
                     char buffer[READ_BUFFER_SIZE];
                     // TODO: ! This assumes request can be read non-blocking as once!
@@ -198,9 +200,13 @@ int SocketHandler::run()
                         it->revents = 0;
                         continue;
                     }
-                    _conns[it->fd].request.feed(buffer, _servers[0].getConfig()); // TODO: get correct config
-                    _conns[it->fd].buffer.append(buffer, 0, res);
-                    _conns[it->fd].contentLength += res;
+                    bool complete = _conns[it->fd].request.feed(buffer, _servers[0].getConfig()); // TODO: get correct config
+                    // the config is just for max, is ok for now
+                    if (!complete)
+                        continue;
+                        
+                    // _conns[it->fd].buffer.append(buffer, 0, res);
+                    // _conns[it->fd].contentLength += res;
 
                     Logger::debug("extended buffer");
                     // shutdown(it->fd, 0); // no reads anymore
