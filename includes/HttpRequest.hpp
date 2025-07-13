@@ -47,7 +47,7 @@ class HttpRequest : public HttpMessage {
         void parseHeaders(const config_map &serverConfig);
         void parse(const config_map &serverConfig);
 
-        bool feed(const std::string & addition, const config_map &serverConfig);
+        bool feed(const std::string & addition, size_t len, const config_map &serverConfig);
 
         // --- Setters ---
         void setMethod(const std::string &m) { method = m; }

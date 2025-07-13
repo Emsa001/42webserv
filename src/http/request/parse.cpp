@@ -118,8 +118,8 @@ void HttpRequest::parse(const config_map &serverConfig) {
 
 // Feed bytes from the buffer into the request
 // When the headers are complete, parse the headers
-bool HttpRequest::feed(const std::string & addition, const config_map &serverConfig) {
-    rawRequestData.append(addition);
+bool HttpRequest::feed(const std::string & addition, size_t len, const config_map &serverConfig) {
+    rawRequestData.append(addition.substr(0, len));
 
     std::string::size_type res = rawRequestData.find("\r\n\r\n"); // TODO: maybe don't read all of it again?
     bool headersEnded = res != std::string::npos;

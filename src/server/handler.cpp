@@ -199,17 +199,19 @@ int SocketHandler::run()
                         it->revents = 0;
                         continue;
                     }
-                    bool complete = _conns[it->fd].request.feed(buffer, _servers[0].getConfig()); // TODO: get correct config
+                    bool complete = _conns[it->fd].request.feed(buffer, res, _servers[0].getConfig()); // TODO: get correct config
+                    Logger::debug("extended buffer");
                     if (_conns[it->fd].request.getHeadersParsed())
                         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
                     // the config is just for max, is ok for now
                     if (!complete)
                         continue;
+
+                    Logger::debug(_conns[it->fd].request.getRawRequestData());
                         
                     // _conns[it->fd].buffer.append(buffer, 0, res);
                     // _conns[it->fd].contentLength += res;
 
-                    Logger::debug("extended buffer");
                     // shutdown(it->fd, 0); // no reads anymore
                     // Logger::debug(_conns[it->fd].request.getRawRequestData());
                     
