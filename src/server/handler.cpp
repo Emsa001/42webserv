@@ -72,8 +72,9 @@ bool SocketHandler::InitSockets()
         int sock = newfd.fd;
 
         // // Enable TCP Keepalive
-        int optval = 1;
+        int optval = 0;
         setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+        optval = 1;
         setsockopt(newfd.fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
         
         int keep_idle = 10;     // Start checking after 10 second of inactivity
@@ -171,13 +172,41 @@ int SocketHandler::run()
                         continue;
                     }
                     _conns[it->fd].buffer.append(buffer, 0, res);
+                    
                     Logger::debug("extended buffer");
-                    shutdown(it->fd, 0); // no reads anymore
-
+                    // shutdown(it->fd, 0); // no reads anymore
+                    
+                    std::cout << _conns[it->fd].buffer << std::endl;
+                    
                     HttpRequest request(_conns[it->fd].buffer);
                     Server &s = determineServer(request, _conns[it->fd].port);
-                    // request.parse(s.getConfig());
+                    request.parse(s.getConfig());
+                    
+                    // set socket timeout if keep-alive is set
+                    std::string header_keepalive = request.getHeader("Keep-Alive");
+                    if (!header_keepalive.empty()) {
+                        size_t pos = header_keepalive.find("Timeout=");
+                        header_keepalive.erase(pos, std::string("Timeout=").length());
+                        Logger::debug("Header 'Keep-Alive: " + header_keepalive + "'");
 
+                        struct timeval sock_timeout;
+                        sock_timeout.tv_usec = 0;
+                        try {
+                            sock_timeout.tv_sec = stringToInt(header_keepalive);
+                            if (sock_timeout.tv_sec <= 0)
+                                throw HttpRequestException(400);
+                            if (sock_timeout.tv_sec > MAX_KEEPALIVE)
+                                sock_timeout.tv_sec = MAX_KEEPALIVE;
+                            Logger::debug("keepalive is " + intToString(sock_timeout.tv_sec));
+                        } catch(std::exception &e) {
+                            throw HttpRequestException(400);
+                        }
+                        int optval = 0;
+                        setsockopt(it->fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+                        setsockopt(it->fd, SOL_SOCKET, SO_RCVTIMEO, &sock_timeout, sizeof(sock_timeout));
+                        setsockopt(it->fd, SOL_SOCKET, SO_SNDTIMEO, &sock_timeout, sizeof(sock_timeout));
+                    }
+                    
                     // figure out where to direct request
                     // Logger::info(intToString(_conns[it->fd].port));
                     // Server &s = determineServer(request, _conns[it->fd].port);

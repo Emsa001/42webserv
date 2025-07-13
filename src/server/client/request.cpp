@@ -104,7 +104,7 @@
 //         size_t totalRequired = state->buffer.find("\r\n\r\n") + 4 + state->contentLength;
 
 //         if (state->buffer.size() >= totalRequired) {
-//             HttpRequest request(state->buffer, this->config);
+//             wHttpRequest request(state->buffer, this->config);
 //             request.parse();
 //             HttpResponse response = this->handleResponse(&request);
 

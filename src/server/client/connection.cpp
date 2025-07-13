@@ -1,7 +1,5 @@
 #include "Webserv.hpp"
 
-// TODO: All this in SocketHandler
-
 // void Server::acceptNewConnections(int server_sock) {
 //     while (true) {
 //         sockaddr_in client_addr;
@@ -25,21 +23,6 @@
 
 //         client_timestamps[client_fd] = time(NULL);
 //     }
-// }
-
-// void Server::checkIdleClients() {
-//     time_t now = time(NULL);
-
-    // for (size_t i = 1; i < fds.size(); ++i) {
-    //     int fd = fds[i].fd;
-
-    //     if (now - client_timestamps[fd] > this->keep_alive) {
-    //         // std::cout << "Idle timeout, closing fd: " << fd << std::endl;
-    //         Logger::clientIdle(fd);
-    //         this->removeClient(i);
-    //         --i;
-    //     }
-    // }
 // }
 
 // void Server::removeClient(size_t index) {

@@ -4,7 +4,7 @@
 #include "Webserv.hpp"
 
 #define LOG_ENABLED true
-#define LOG_LEVEL 1 // DEBUG
+#define LOG_LEVEL 0 // DEBUG
 
 class Logger {
     private:

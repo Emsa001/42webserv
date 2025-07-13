@@ -18,9 +18,12 @@ struct ClientRequestState;
 class SocketHandler {
 private:
     std::vector<Server> _servers;
-    std::map<int, int> _fds_to_ports;
-    std::vector<pollfd> _pollfds;
     int _num_sockets;
+
+    // connections
+    std::map<int, int> _fds_to_ports;
+    // pollfds vector to be passed on to poll()
+    std::vector<pollfd> _pollfds;
 
     /* the _pollfds vector is an array of `struct pollfd` able to be passed to poll()
     connection file descriptors are appended to the end as needed
@@ -30,8 +33,6 @@ private:
                 _num_sockets
     
     */
-    // TODO: Move this to SocketHandler
-    std::vector<pollfd> fds;
     // std::map<int, time_t> client_timestamps;
     std::map<int, ClientRequestState> _conns;
 
@@ -54,6 +55,22 @@ private:
     Server &determineServer(HttpRequest &req, int port);
 
     bool portTaken(int port);
+
+    // Close connections that have been idle for keepAlive ms.
+    // void unaliveConnections() {
+    //     time_t now = time(NULL);
+
+    //     for (size_t i = 1; i < _conns.size(); ++i) {
+    //         int fd = fds[i].fd;
+
+    //         if (now - client_timestamps[fd] > this->keep_alive) {
+    //             // std::cout << "Idle timeout, closing fd: " << fd << std::endl;
+    //             Logger::clientIdle(fd);
+    //             this->removeClient(i);
+    //             --i;
+    //         }
+    //     }
+    // }
 
 public:
     SocketHandler(const config_array& servers);
