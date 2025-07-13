@@ -62,6 +62,7 @@ ConfigSchema createSchema()
     locationSchema.addEntry("redirect", STRING, false);
     locationSchema.addEntry("autoindex", BOOL, false);
     locationSchema.addEntry("upload_path", STRING, false);
+    locationSchema.addEntry("extension", STRING, false);
 
     locationSchema.addEntry("cgi", BOOL, false);
 

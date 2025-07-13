@@ -21,6 +21,20 @@ const FileData Server::createFileData(const config_map *location, HttpRequest *r
         fullPath += "/" + index;
     }
 
+    if(!Config::getSafe(*location, "extension", std::string("")).getString().empty()){
+        std::string index = Config::getSafe(*location, "index", (std::string)"index.html").getString();
+        // remove last element from fullPath so ./www//tester/test.bla -> ./www//tester
+        if(fullPath[fullPath.size() - 1] == '/')
+            fullPath += index;
+        else if(fullPath.find_last_of('/') != std::string::npos)
+            fullPath = fullPath.substr(0, fullPath.find_last_of('/')) + "/" + index;
+        
+        // add index to fullPath if it doesn't have an extension
+        if(fullPath.find_last_of('.') == std::string::npos){
+            fullPath += index;
+        }
+    }
+
     // std::cout << std::endl;
     // std::cout << "Full path: " << fullPath << std::endl;
     // std::cout << "Request path: " << requestPath << std::endl;
