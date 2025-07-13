@@ -12,13 +12,6 @@ SocketHandler::SocketHandler(const config_array& servers): _num_sockets(0)
     }
 }
 
-// SocketHandler::SocketHandler()
-// {
-//     Config &config = Config::instance();
-//     config.parse("conf/default.yml");
-//     _serversConfig = config.getServers();
-// }
-
 SocketHandler::~SocketHandler()
 {
     Logger::debug("Deconstructing SocketHandler");
@@ -189,18 +182,11 @@ void SocketHandler::processData(int i) {
     if (!complete)
         // continue;//TODO
         return ;
-
-    Logger::debug(_conns[it->fd].request.getRawRequestData());
         
-    // _conns[it->fd].buffer.append(buffer, 0, res);
-    // _conns[it->fd].contentLength += res;
-
-    // shutdown(it->fd, 0); // no reads anymore
-    // Logger::debug(_conns[it->fd].request.getRawRequestData());
+    Logger::debug(_conns[it->fd].request.getRawRequestData());
     
-    // HttpRequest request(_conns[it->fd].buffer);
+    // figure out where to direct request
     Server &s = determineServer(_conns[it->fd].request, _conns[it->fd].port);
-    // request.parse(s.getConfig());
     
     // set socket timeout if keep-alive is set
     std::string header_keepalive = _conns[it->fd].request.getHeader("keep-alive");
@@ -209,7 +195,7 @@ void SocketHandler::processData(int i) {
         if (pos != std::string::npos) {
             header_keepalive.erase(pos, std::string("Timeout=").length());
             Logger::debug("Header 'Keep-Alive: " + header_keepalive + "'");
-
+            
             struct timeval sock_timeout;
             sock_timeout.tv_usec = 0;
             try {
@@ -217,12 +203,12 @@ void SocketHandler::processData(int i) {
 
                 // ensure valid value
                 if (sock_timeout.tv_sec <= 0)
-                    throw HttpRequestException(400);
+                throw HttpRequestException(400);
                 if (sock_timeout.tv_sec > MAX_KEEPALIVE)
                     sock_timeout.tv_sec = MAX_KEEPALIVE;
-                Logger::debug("keepalive is " + intToString(sock_timeout.tv_sec));
-                _conns[it->fd].keepalive = true;
-            } catch(std::exception &e) {
+                    Logger::debug("keepalive is " + intToString(sock_timeout.tv_sec));
+                    _conns[it->fd].keepalive = true;
+                } catch(std::exception &e) {
                 throw HttpRequestException(400);
             }
             int optval = 0;
@@ -231,13 +217,13 @@ void SocketHandler::processData(int i) {
             setsockopt(it->fd, SOL_SOCKET, SO_SNDTIMEO, &sock_timeout, sizeof(sock_timeout));
         }
     }
+
+    if (!_conns[it->fd].keepalive)
+        shutdown(it->fd, 0); // no reads anymore
     
-    // figure out where to direct request
-    // Logger::info(intToString(_conns[it->fd].port));
-    // Server &s = determineServer(request, _conns[it->fd].port);
     HttpResponse response = s.handleResponse(&_conns[it->fd].request);
-    // Logger::info(request.getMethod() + " " + request.getURI());
     std::string responseStr = response.getResponse();
+
     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0) {
         Logger::error();
         perror("error3: ");
@@ -258,8 +244,6 @@ void SocketHandler::processData(int i) {
         Logger::info("removing");
         perror("error2: ");
     }
-
-    // HttpRequest r();
 }
 
 int SocketHandler::run()
@@ -277,7 +261,6 @@ int SocketHandler::run()
             return -2;
         }
         // Looping backwards to prevent iterator invalidation
-        // TODO: make this work with (reverse) iterators
         for (int i=_pollfds.size()-1; i>=0; --i) {   
             struct pollfd *it = &_pollfds[i];         
             if (it->revents & POLLIN) {

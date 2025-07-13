@@ -40,41 +40,11 @@ private:
     //  in the ClientRequestState struct
     std::map<int, ClientRequestState> _conns;
 
-    // TODO: Move this to SocketHandler
-    // void listener(int server_sock);
-    // void setNonBlocking(int sock);
-    // void acceptNewConnections(int server_sock);
-    // void handleClientRead(size_t index);
-    // void checkIdleClients();
-    // void removeClient(size_t index);
-
-    // TODO: keep-alive
-    // this->keep_alive = Config::getSafe(config, "keep_alive", 30).getInt();;
-    
-    // TODO: Move this to SocketHandler
-    ClientRequestState *readChunk(int fd, int index, char *buffer);
-    int readBytes(int fd, int index, char *buffer);
-
     // Determine server responsible for request (based on port and "Host" header)
     Server &determineServer(HttpRequest &req, int port);
 
     bool portTaken(int port);
 
-    // Close connections that have been idle for keepAlive ms.
-    // void unaliveConnections() {
-    //     time_t now = time(NULL);
-
-    //     for (size_t i = 1; i < _conns.size(); ++i) {
-    //         int fd = fds[i].fd;
-
-    //         if (now - client_timestamps[fd] > this->keep_alive) {
-    //             // std::cout << "Idle timeout, closing fd: " << fd << std::endl;
-    //             Logger::clientIdle(fd);
-    //             this->removeClient(i);
-    //             --i;
-    //         }
-    //     }
-    // }
 
 public:
     SocketHandler(const config_array& servers);
