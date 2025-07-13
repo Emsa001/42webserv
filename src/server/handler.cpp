@@ -160,7 +160,7 @@ void SocketHandler::processConnection(int i)
     newReq.contentLength = 0;
     newReq.keepalive = false;
     newReq.expectedSize = -1;
-    newReq.headersParsed = false;
+    newReq.headersComplete = false;
     newReq.request = HttpRequest("");
     newReq.buffer.clear();
 
@@ -188,7 +188,7 @@ void SocketHandler::processData(int i)
     }
     bool complete = _conns[it->fd].request.feed(buffer, res, _servers[0].getConfig()); // TODO: get correct config
     Logger::debug("extended buffer");
-    if (_conns[it->fd].request.getHeadersParsed())
+    if (_conns[it->fd].request.getHeadersComplete())
         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
     // the config is just for max, is ok for now
     if (!complete)
@@ -235,10 +235,12 @@ void SocketHandler::processData(int i)
         }
     }
 
-    if (!_conns[it->fd].keepalive)
-        shutdown(it->fd, 0); // no reads anymore
+    // if (!_conns[it->fd].keepalive)
+    //     shutdown(it->fd, 0); // no reads anymore
 
     HttpResponse response = s.handleResponse(&_conns[it->fd].request);
+    if (response.isInvalid()) // TODO: wait until request.isBodyComplete()
+        return ;
     std::string responseStr = response.getResponse();
 
     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
@@ -250,7 +252,7 @@ void SocketHandler::processData(int i)
 
     _conns[it->fd].buffer.clear();
     _conns[it->fd].contentLength = -1;
-    _conns[it->fd].headersParsed = false;
+    _conns[it->fd].headersComplete = false;
     _conns[it->fd].request = HttpRequest();
     if (!_conns[it->fd].keepalive)
     {

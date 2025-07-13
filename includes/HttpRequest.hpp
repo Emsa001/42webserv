@@ -29,17 +29,20 @@ class HttpRequest : public HttpMessage {
 
         
         std::string rawRequestData;
-        bool headersParsed;
+        bool headersComplete;
+        bool bodyComplete;
         std::string::size_type headerEnd;
+
         int content_length;
+        int length;
 
         std::string normalizeUri(const std::string &uri);
 
 
     public:
         HttpRequest(const std::string &rawData="")
-            : url(NULL), rawRequestData(rawData), headersParsed(false),
-            headerEnd(std::string::npos), content_length(-1) {
+            : url(NULL), rawRequestData(rawData), headersComplete(false), bodyComplete(false),
+            headerEnd(std::string::npos), content_length(-1), length(0) {
         }
 
         ~HttpRequest() { delete url; }
@@ -61,8 +64,11 @@ class HttpRequest : public HttpMessage {
         HttpURL *getURL() const { return url; }
         const std::string &getPort() const { return port; }
         const std::string &getRawRequestData() const { return rawRequestData; }
+        int getBodyLength() { return length; }
 
-        bool getHeadersParsed() const { return headersParsed; }
+        
+        bool getHeadersComplete() const { return headersComplete; }
+        bool getBodyComplete() const { return bodyComplete; }
 };
 
 class HttpRequestException : public std::exception {
@@ -83,7 +89,7 @@ struct ClientRequestState {
     HttpRequest request;
 
     std::string buffer;
-    bool headersParsed;
+    bool headersComplete;
     size_t contentLength;
     size_t expectedSize;
 };

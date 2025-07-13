@@ -49,7 +49,7 @@
 //     }
 
 //     size_t headerEnd = state.buffer.find("\r\n\r\n");
-//     if (headerEnd != std::string::npos && !state.headersParsed) {
+//     if (headerEnd != std::string::npos && !state.headersComplete) {
 //         std::string headers = state.buffer.substr(0, headerEnd);
 
 //         // Validate headers before proceeding
@@ -64,7 +64,7 @@
 //             return NULL;
 //         }
 
-//         state.headersParsed = true;
+//         state.headersComplete = true;
 
 //         // Soft parse just Content-Length to know when to stop reading
 //         size_t clPos = headers.find("Content-Length:");
@@ -83,7 +83,7 @@
 //     }
 
 //     // All data we need is available
-//     if (state.headersParsed && state.buffer.size() >= state.expectedSize) {
+//     if (state.headersComplete && state.buffer.size() >= state.expectedSize) {
 //         return &state;
 //     }
 
@@ -100,7 +100,7 @@
 //     ClientRequestState *state = this->readChunk(fd, index, buffer);
 //     if(state == NULL) return;
 
-//     if (state->headersParsed) {
+//     if (state->headersComplete) {
 //         size_t totalRequired = state->buffer.find("\r\n\r\n") + 4 + state->contentLength;
 
 //         if (state->buffer.size() >= totalRequired) {

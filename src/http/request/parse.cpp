@@ -58,7 +58,7 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
         // Logger::debug("clen is " + intToString(content_length));
         // Logger::debug("done parsing headers");
     }
-    headersParsed = true;
+    headersComplete = true;
 }
 
 /**
@@ -92,7 +92,7 @@ void HttpRequest::parse(const config_map &serverConfig) {
     int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
 
     // 1. parse headers in separate function - if not already done
-    if (!headersParsed)
+    if (!headersComplete)
         parseHeaders(serverConfig);
 
     // 2. Split the request into header and body parts
@@ -123,26 +123,33 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
 
     std::string::size_type res = rawRequestData.find("\r\n\r\n"); // TODO: maybe don't read all of it again?
     bool headersEnded = res != std::string::npos;
-    if (!headersParsed && headersEnded)
+    if (!headersComplete && headersEnded) {
         parseHeaders(serverConfig);
-    if (headersParsed) {
+        // state change: headers parsed
+    }
+    if (headersComplete) {
         if (addition.size() > 10000) { // TODO: max_header_size ?
             // lots of bytes read, but still no body -> Bad Request
             throw HttpRequestException(400);
         }
-        std::string bodyPart = rawRequestData.substr(headerEnd + 4);
-        // std::cout << bodyPart << std::endl;
 
-        if (getMethod() == "GET")
-            return true;
-        // just wait for it
-        if (content_length >= 0 && bodyPart.size() >= (size_t) stringToInt(getHeader("Content-Length")))
-            return true;
+        return true;
 
-        if (bodyPart.find("\r\n\r\n") != std::string::npos) {
-            Logger::debug("found end of request");
-            return true;
-        }
+        // std::string bodyPart = rawRequestData.substr(headerEnd + 4);
+        // length = bodyPart.size();
+        // // std::cout << bodyPart << std::endl;
+
+        // // just wait for it
+        // if (content_length >= 0 && bodyPart.size() >= (size_t) stringToInt(getHeader("Content-Length"))) {
+        //     bodyComplete = true;
+        //     return true;
+        // }
+
+        // if (bodyPart.find("\r\n\r\n") != std::string::npos) {
+        //     bodyComplete = true;
+        //     Logger::debug("found end of request");
+        //     return true;
+        // }
     }
     // Logger::debug("reading but not done");
     return false;

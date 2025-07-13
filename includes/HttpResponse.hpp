@@ -22,6 +22,8 @@ class HttpResponse : public HttpMessage {
         bool cgi;                        ///< True if body is CGI script output
 
         unsigned short statusCode;       ///< HTTP status code (e.g., 200)
+
+        bool invalid;
         
 
         // --- Private helper methods ---
@@ -45,7 +47,9 @@ class HttpResponse : public HttpMessage {
          */
         HttpResponse(HttpRequest *request, config_map &config)
             : request(request), config(config), statusLine("HTTP/1.1 200 OK"),
-              listing(false), cgi(false), statusCode(200) {}
+              listing(false), cgi(false), statusCode(200), invalid(false) {}
+
+        HttpResponse(): invalid(true) {}
 
         ~HttpResponse() {}
 
@@ -90,6 +94,8 @@ class HttpResponse : public HttpMessage {
         
         std::string getResponse() const { return response; }
         std::string getStatusLine() const { return statusLine; }
+
+        bool isInvalid() { return invalid; }
     
         unsigned short getStatusCode() const { return statusCode; }
         bool isCgi() const { return cgi; }

@@ -48,6 +48,10 @@ HttpResponse Server::handleResponse(HttpRequest *request) {
         if (!fileData.exists) 
             throw HttpRequestException(404);
        
+        if (!request->getHeader("content-length").empty() && 
+                request->getBodyLength() < stringToInt(request->getHeader("content-length")))
+            return HttpResponse(); // invalid response, signals that we need to wait for body
+
         response.setSettings(*location);
         response.buildBody(fileData, request); 
 
