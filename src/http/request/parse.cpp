@@ -125,7 +125,8 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
         // state change: headers parsed
     }
     if (headersComplete) {
-        if (body.size() > (size_t) maxBodySize) { // TODO: max_header_size ?
+        std::string bodyPart = rawRequestData.substr(headerEnd + 4);
+        if (bodyPart.size() > (size_t) maxBodySize) { // TODO: max_header_size ?
             // lots of bytes read, but still no body -> Bad Request
             // throw HttpRequestException(400);
             return false;
@@ -133,7 +134,6 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
 
         return true;
 
-        // std::string bodyPart = rawRequestData.substr(headerEnd + 4);
         // length = bodyPart.size();
         // // std::cout << bodyPart << std::endl;
 
