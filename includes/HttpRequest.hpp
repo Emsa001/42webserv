@@ -61,6 +61,8 @@ class HttpRequest : public HttpMessage {
         HttpURL *getURL() const { return url; }
         const std::string &getPort() const { return port; }
         const std::string &getRawRequestData() const { return rawRequestData; }
+
+        bool getHeadersParsed() const { return headersParsed; }
 };
 
 class HttpRequestException : public std::exception {

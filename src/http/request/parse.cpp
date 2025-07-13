@@ -131,7 +131,7 @@ bool HttpRequest::feed(const std::string & addition, const config_map &serverCon
             throw HttpRequestException(400);
         }
         std::string bodyPart = rawRequestData.substr(headerEnd + 4);
-        std::cout << bodyPart << std::endl;
+        // std::cout << bodyPart << std::endl;
 
         if (getMethod() == "GET")
             return true;
@@ -144,7 +144,7 @@ bool HttpRequest::feed(const std::string & addition, const config_map &serverCon
             return true;
         }
     }
-    Logger::debug("reading but not done");
+    // Logger::debug("reading but not done");
     return false;
 }
 

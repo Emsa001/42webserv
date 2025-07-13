@@ -191,16 +191,17 @@ int SocketHandler::run()
                     
                     // Logger::debug("data from conn");
                     char buffer[READ_BUFFER_SIZE];
-                    // TODO: ! This assumes request can be read non-blocking as once!
                     int res = recv(it->fd, buffer, sizeof(buffer), 0);
                     // TODO: error check `res`
                     if (res < 0) {
                         Logger::error("recv() error");
-                        std::cout << it->fd << std::endl;
+                        // std::cout << it->fd << std::endl;
                         it->revents = 0;
                         continue;
                     }
                     bool complete = _conns[it->fd].request.feed(buffer, _servers[0].getConfig()); // TODO: get correct config
+                    if (_conns[it->fd].request.getHeadersParsed())
+                        Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
                     // the config is just for max, is ok for now
                     if (!complete)
                         continue;
@@ -210,16 +211,14 @@ int SocketHandler::run()
 
                     Logger::debug("extended buffer");
                     // shutdown(it->fd, 0); // no reads anymore
-                    
-                    std::cout << _conns[it->fd].buffer << std::endl;
+                    // Logger::debug(_conns[it->fd].request.getRawRequestData());
                     
                     // HttpRequest request(_conns[it->fd].buffer);
                     Server &s = determineServer(_conns[it->fd].request, _conns[it->fd].port);
                     // request.parse(s.getConfig());
                     
-
                     // set socket timeout if keep-alive is set
-                    std::string header_keepalive = _conns[it->fd].request.getHeader("Keep-Alive");
+                    std::string header_keepalive = _conns[it->fd].request.getHeader("keep-alive");
                     if (!header_keepalive.empty()) {
                         size_t pos = header_keepalive.find("Timeout=");
                         header_keepalive.erase(pos, std::string("Timeout=").length());
@@ -256,9 +255,14 @@ int SocketHandler::run()
                         Logger::error();
                         perror("error3: ");
                     }
-                    close(it->fd);
-                    _conns.erase(it->fd);
-                    _pollfds.erase(_pollfds.begin() + i);
+                    Logger::debug("sent response");
+
+                    if (!_conns[it->fd].keepalive) {
+                        close(it->fd);
+                        _conns.erase(it->fd);
+                        _pollfds.erase(_pollfds.begin() + i);
+                        Logger::debug("closed connection");
+                    }
                     if (res <= 0) {
                         Logger::info("removing");
                         perror("error2: ");

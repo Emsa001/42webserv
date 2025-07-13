@@ -5,9 +5,9 @@
 void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
     Server server(*data);
-    std::cout << std::endl;
-    // server.start();
-    std::cout << std::endl;
+    // std::cout << std::endl;
+    // // server.start();
+    // std::cout << std::endl;
     return NULL;
 }
 

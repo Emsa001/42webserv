@@ -16,6 +16,8 @@
  * - The client timestamp update should be handled in SocketHandler, not here.
  */
 HttpResponse Server::handleResponse(HttpRequest *request) {
+    // Logger::debug(request->getRawRequestData());
+
     HttpResponse response(request, this->config);
     std::string connectionHeader = "close";
 
