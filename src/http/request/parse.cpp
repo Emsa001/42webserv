@@ -53,10 +53,10 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
     if (getHeader("Content-Length").empty())
         content_length = -1;
     else {
-        Logger::debug("clen is " + getHeader("Content-Length"));
+        // Logger::debug("clen is " + getHeader("Content-Length"));
         content_length = stringToInt(getHeader("Content-Length"));
-        Logger::debug("clen is " + intToString(content_length));
-        Logger::debug("done parsing headers");
+        // Logger::debug("clen is " + intToString(content_length));
+        // Logger::debug("done parsing headers");
     }
     headersParsed = true;
 }
