@@ -2,7 +2,7 @@ NAME			= webserv
 
 # compiler settings
 CXX				= c++
-CXXFLAGS		= -Wall -Wextra -Werror
+CXXFLAGS		= -Wall -Wextra
 CXXFLAGS		+= -std=c++98 -pedantic
 # CXXFLAGS		+= -fsanitize=address
 CXXFLAGS		+= -g
