@@ -64,7 +64,9 @@ HttpResponse Server::handleResponse(HttpRequest *request) {
 
 
 bool Server::isValidMethod(HttpRequest *request, const config_map &location){
-    std::string methods = Config::getSafe(location, "methods", (std::string)DEFAULT_METHODS).getString();
+    std::string methods = Config::getSafe(location, "methods", (std::string)ALLOWED_METHODS).getString();
+    if(std::string(ALLOWED_METHODS).find(request->getMethod()) == std::string::npos) 
+        return false;
     return methods.find(request->getMethod()) != std::string::npos;
 }
 
