@@ -25,18 +25,32 @@ SocketHandler::~SocketHandler()
 }
 
 Server & SocketHandler::determineServer(HttpRequest &req, int port) {
-    (void) req; // TODO: make use of 'Host' header
-    for (size_t i=0; i<_servers.size(); ++i) {
-        std::string const &listen = Config::getSafe(_servers[i].getConfig(), "listen", "").getString();
-        if (stringToInt(listen) == port)
+    std::string hostHeader = req.getHeader("Host");
+    
+    // Extract hostname from Host header
+    std::string hostname = hostHeader;
+    size_t colonPos = hostname.find(':');
+    if (colonPos != std::string::npos)
+        hostname = hostname.substr(0, colonPos);
+
+
+    // Find server by port and server_name
+    for (size_t i = 0; i < _servers.size(); ++i) {
+        std::string const listen = Config::getSafe(_servers[i].getConfig(), "listen", "").getString();
+        std::string const serverName = Config::getSafe(_servers[i].getConfig(), "server_name", "").getString();
+
+        if (stringToInt(listen) == port && (serverName == hostname || serverName == hostHeader)) {
             return _servers[i];
+        }
     }
+    
+    // TODO ignore request
     return _servers[0];
 }
 
 bool SocketHandler::portTaken(int port) {
-    for (size_t i=0; i<_fds_to_ports.size(); ++i) {
-        if (_fds_to_ports[i] == port)
+    for (std::map<int, int>::const_iterator it = _fds_to_ports.begin(); it != _fds_to_ports.end(); ++it) {
+        if (it->second == port)
             return true;
     }
     return false;
@@ -52,30 +66,40 @@ bool SocketHandler::InitSockets()
     hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;     //
     
-    std::string const host = "0.0.0.0";//Config::getSafe(_servers[0].getConfig(), "listen");
-
-    for (size_t i=0; i<_servers.size(); ++i) {
+    // Group servers by port to handle virtual hosts
+    std::map<int, std::vector<size_t> > portToServers;
+    for (size_t i = 0; i < _servers.size(); ++i) {
         std::string const port = Config::getSafe(_servers[i].getConfig(), "listen");
         int port_int = stringToInt(port);
-        if (portTaken(port_int))
-            continue;
+        portToServers[port_int].push_back(i);
+    }
+    
+    // Create sockets for each unique port
+    for (std::map<int, std::vector<size_t> >::iterator portIt = portToServers.begin(); 
+         portIt != portToServers.end(); ++portIt) {
+        
+        int port_int = portIt->first;
+        std::string port = intToString(port_int);
+        std::string const host = "0.0.0.0";
+        
         int r;
         if ((r = getaddrinfo(host.c_str(), port.c_str(), &hints, &res)) < 0)
             perror("getaddrinfo");
-        // struct pollfd newfd = (struct pollfd){ .events = POLLIN, .revents = 0 };
+            
         struct pollfd newfd;
-        // std::cout << res->ai_family << std::endl;
         newfd.events = POLLIN;
         newfd.revents = 0;
         newfd.fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
         _fds_to_ports[newfd.fd] = port_int;
         int sock = newfd.fd;
 
-        // // Enable TCP Keepalive
-        int optval = 0;
-        setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
-        optval = 1;
+        // Enable socket reuse
+        int optval = 1;
         setsockopt(newfd.fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+        
+        // Disable TCP Keepalive for listening socket (will be set per connection)
+        optval = 0;
+        setsockopt(newfd.fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
         
         int keep_idle = 10;     // Start checking after 10 second of inactivity
         int keep_interval = 5;  // Send keep-alive probes every 5 second
@@ -94,8 +118,9 @@ bool SocketHandler::InitSockets()
 
         _pollfds.push_back(newfd);
         _num_sockets++;
+        
+        freeaddrinfo(res);
     }
-
 
     return true;
 }
@@ -119,7 +144,7 @@ int SocketHandler::run()
         for (int i=_pollfds.size()-1; i>=0; --i) {
             struct pollfd *it = &_pollfds[i];
             struct sockaddr_in addr;
-            socklen_t addrlen;
+            socklen_t addrlen = sizeof(addr);
             
             if (it->revents & POLLIN) {
                 // event was on socket
