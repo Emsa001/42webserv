@@ -2,8 +2,8 @@
 
 bool ends_with(const std::string &str, const std::string &suffix)
 {
-    if(str.size() >= suffix.size())
-        if(str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0)
+    if (str.size() >= suffix.size())
+        if (str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0)
             return true;
     return false;
 }
@@ -49,7 +49,8 @@ std::string get_body(const std::string &output)
     return body;
 }
 
-// TODO: Check what is that, can't we just use getHeaders and setHeader from HttpMessage?
+// TODO: Check what is that, can't we just use getHeaders and setHeader from
+// HttpMessage?
 
 StringMultiMap get_headers(const std::string &output)
 {
@@ -81,11 +82,10 @@ StringMultiMap get_headers(const std::string &output)
     return headers;
 }
 
-
 void set_headers(HttpResponse *response, const std::string &output)
 {
     StringMultiMap headers = get_headers(output);
-    if(headers.empty())
+    if (headers.empty())
         throw HttpRequestException(500);
 
     for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)

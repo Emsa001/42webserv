@@ -2,7 +2,8 @@
 
 volatile sig_atomic_t g_stop;
 
-void signalHandler(int signum) {
+void signalHandler(int signum)
+{
     g_stop = 1;
 
     std::cout << "Signal (" << signum << ") received." << std::endl;

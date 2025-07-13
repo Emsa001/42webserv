@@ -10,17 +10,21 @@ std::string Cgi::get_query(const std::string &uri)
     return "";
 }
 
-std::string Cgi::toEnvFormat(const std::string &header) {
+std::string Cgi::toEnvFormat(const std::string &header)
+{
     std::string result;
-    for (size_t i = 0; i < header.length(); ++i) {
+    for (size_t i = 0; i < header.length(); ++i)
+    {
         char c = header[i];
-        if (c == '-') result += '_';
-        else result += std::toupper(c);
+        if (c == '-')
+            result += '_';
+        else
+            result += std::toupper(c);
     }
     return result;
 }
 
-StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest* request)
+StringMap Cgi::get_env(const std::string &scriptPath, const HttpRequest *request)
 {
     std::string query = this->get_query(request->getURI());
 
@@ -40,23 +44,24 @@ StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest* request
     env["REQUEST_URI"] = request->getURI();
 
     // Headers (prefixed with HTTP_)
-    const std::string headers_arr[] = {
-        "Host", "User-Agent", "Accept", "Accept-Language", "Accept-Encoding",
-        "Connection", "Referer", "Cookie"
-    };
-    const std::vector<std::string> headers(headers_arr, headers_arr + sizeof(headers_arr)/sizeof(headers_arr[0]));
+    const std::string headers_arr[] = {"Host",       "User-Agent", "Accept", "Accept-Language", "Accept-Encoding",
+                                       "Connection", "Referer",    "Cookie"};
+    const std::vector<std::string> headers(headers_arr, headers_arr + sizeof(headers_arr) / sizeof(headers_arr[0]));
 
-    for (size_t i = 0; i < headers.size(); ++i) {
+    for (size_t i = 0; i < headers.size(); ++i)
+    {
         std::string header = headers[i];
         std::string value = request->getHeader(header);
-        if (!value.empty()) {
+        if (!value.empty())
+        {
             std::string key = "HTTP_" + this->toEnvFormat(header);
             env[key] = value;
         }
     }
 
     // POST/DELETE handling
-    if (request->getMethod() == "POST" || request->getMethod() == "DELETE") {
+    if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
+    {
         env["CONTENT_LENGTH"] = intToString(request->getBody().size());
         std::string contentType = request->getHeader("Content-Type");
         if (!contentType.empty())
@@ -66,10 +71,9 @@ StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest* request
     return env;
 }
 
-
-char **Cgi::convert_env(const StringMap& env_map)
+char **Cgi::convert_env(const StringMap &env_map)
 {
-    char **env = new char*[env_map.size() + 1];
+    char **env = new char *[env_map.size() + 1];
     size_t i = 0;
 
     for (StringMap::const_iterator it = env_map.begin(); it != env_map.end(); ++it)

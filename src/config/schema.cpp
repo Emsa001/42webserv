@@ -1,6 +1,5 @@
 #include "Webserv.hpp"
 
-
 void ConfigSchema::addEntry(const std::string &key, ValueType type, bool required)
 {
     SchemaEntry entry;

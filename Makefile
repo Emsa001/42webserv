@@ -38,7 +38,7 @@ $(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o "$@" "$<"
 
 setup:
-	docker build -t pre-commit -f assets/pre-commit.Dockerfile . 
+	docker build -t pre-commit -f assets/pre-commit.Dockerfile .
 
 format:
 	docker run -v.:/mnt -it --rm pre-commit

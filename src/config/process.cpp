@@ -18,8 +18,9 @@ bool ConfigParser::processLine()
         char p = i > 0 ? line[i - 1] : '\0';
         char c = line[i];
         char n = line.size() > i + 1 ? line[i + 1] : '\0';
-        
-        if(!key.empty() && (std::isspace(c) && quote == '\0')) continue;
+
+        if (!key.empty() && (std::isspace(c) && quote == '\0'))
+            continue;
 
         if (handleComment(p, c, quote, i))
             break;
@@ -27,17 +28,22 @@ bool ConfigParser::processLine()
         if (handleIndentation(c, quote, key, previousIndent))
             continue;
 
-        if (handleQuotes(c, quote)){
+        if (handleQuotes(c, quote))
+        {
             forceString = true;
             continue;
         }
 
         int separator = handleKeyValueSeparator(c, n, &isValue, &i, key);
-        if (separator == 1) return true;
-        else if (separator == 0) continue;
+        if (separator == 1)
+            return true;
+        else if (separator == 0)
+            continue;
 
-        if (isValue) value += c;
-        else key += c;
+        if (isValue)
+            value += c;
+        else
+            key += c;
     }
 
     return validateAndSetKey(quote, key, value, forceString);
@@ -47,11 +53,13 @@ int ConfigParser::handleKeyValueSeparator(char c, char n, bool *isValue, size_t 
 {
     if ((c == ':') && !(*isValue))
     {
-        if (n == '\0' || n == '\n'){
+        if (n == '\0' || n == '\n')
+        {
             this->expectedIndent = this->indent + 4;
             return (createNewBlock(key), 1);
         }
-        else if (std::isspace(n)){
+        else if (std::isspace(n))
+        {
             *isValue = true;
             *i += 1;
             return 0;
@@ -76,14 +84,15 @@ bool ConfigParser::handleIndentation(char c, char quote, const std::string &key,
         return true;
     }
 
-    if(this->expectedIndent != -1){
-        if(this->expectedIndent != this->indent)
+    if (this->expectedIndent != -1)
+    {
+        if (this->expectedIndent != this->indent)
             throw ParseError(this->ln, "Indentation not matching");
 
         this->expectedIndent = -1;
     }
 
-    if(this->indent > previousIndent + 4)
+    if (this->indent > previousIndent + 4)
         throw ParseError(this->ln, "Indentation not matching");
 
     return false;
@@ -104,7 +113,7 @@ bool ConfigParser::handleQuotes(char c, char &quote)
 
 bool ConfigParser::validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString)
 {
-    if(key.empty() && value.empty())
+    if (key.empty() && value.empty())
         return true;
     if (this->indent > 0 && this->block == NULL)
         throw ParseError(this->ln, "Indentation not matching");
@@ -117,26 +126,31 @@ bool ConfigParser::validateAndSetKey(char quote, const std::string &key, const s
 
     int blockKind = this->block ? this->block->at("blockKind").getInt() : -1;
 
-    try{
+    try
+    {
         this->schema.validate(key, ConfigValue::detectType(value, forceString).getType(), value, blockKind);
-    }catch (const std::runtime_error &e) {
+    }
+    catch (const std::runtime_error &e)
+    {
         throw ParseError(this->ln, e.what());
     }
 
     return setKey(key, value, forceString);
 }
 
-bool ConfigParser::setKey(const std::string &key, const std::string &value, bool forceString) {
+bool ConfigParser::setKey(const std::string &key, const std::string &value, bool forceString)
+{
     this->setBlock();
     ConfigValue typedValue = ConfigValue::detectType(value, forceString);
-    
-    if (ConfigParser::isReserved(key)) {
+
+    if (ConfigParser::isReserved(key))
+    {
         throw ParseError(this->ln, "'" + key + "' is a reserved keyword");
     }
-    
+
     if (this->block != NULL)
         return setKeyInBlock(key, typedValue);
-    
+
     this->root[key] = typedValue;
 
     return true;

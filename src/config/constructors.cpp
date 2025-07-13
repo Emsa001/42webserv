@@ -1,13 +1,14 @@
 #include "Webserv.hpp"
 
-void ConfigParser::init(){
+void ConfigParser::init()
+{
     this->block = NULL;
     this->blockId = 0;
     this->indent = 0;
     this->expectedIndent = -1;
 
     this->schema = createSchema();
-    
+
     this->ln = 0;
 }
 
@@ -27,5 +28,6 @@ ConfigParser::ConfigParser(std::string const &filename)
 
 ConfigParser::~ConfigParser()
 {
-    // std::cout << "Config destructor called, resources freed successfully." << std::endl;
+    // std::cout << "Config destructor called, resources freed successfully." <<
+    // std::endl;
 }

@@ -1,10 +1,16 @@
 #include "Webserv.hpp"
 
-ConfigValue::ConfigValue() : type(INT), i(0) {}
+ConfigValue::ConfigValue() : type(INT), i(0)
+{
+}
 
-ConfigValue::ConfigValue(bool b) : type(BOOL), b(b) {}
+ConfigValue::ConfigValue(bool b) : type(BOOL), b(b)
+{
+}
 
-ConfigValue::ConfigValue(int i) : type(INT), i(i) {}
+ConfigValue::ConfigValue(int i) : type(INT), i(i)
+{
+}
 
 ConfigValue::ConfigValue(std::string const &str) : type(STRING)
 {
@@ -26,11 +32,44 @@ ConfigValue::ConfigValue(ConfigValue const &other)
     type = other.type;
     switch (type)
     {
-        case BOOL:
-            b = other.b;
-            break;
+    case BOOL:
+        b = other.b;
+        break;
+    case INT:
+        i = other.i;
+        break;
+    case STRING:
+        s = other.s;
+        break;
+    case ARRAY:
+        a = other.a;
+        break;
+    case MAP:
+        m = other.m;
+        break;
+    default:
+        break;
+    }
+}
+
+ConfigValue::~ConfigValue()
+{
+}
+
+// Operators
+
+ConfigValue &ConfigValue::operator=(const ConfigValue &other)
+{
+    if (this != &other)
+    {
+        type = other.type;
+        switch (type)
+        {
         case INT:
             i = other.i;
+            break;
+        case BOOL:
+            b = other.b;
             break;
         case STRING:
             s = other.s;
@@ -43,37 +82,6 @@ ConfigValue::ConfigValue(ConfigValue const &other)
             break;
         default:
             break;
-    }
-}
-
-ConfigValue::~ConfigValue() {}
-
-// Operators
-
-ConfigValue &ConfigValue::operator=(const ConfigValue &other)
-{
-    if (this != &other)
-    {
-        type = other.type;
-        switch (type)
-        {
-            case INT:
-                i = other.i;
-                break;
-            case BOOL:
-                b = other.b;
-                break;
-            case STRING:
-                s = other.s;
-                break;
-            case ARRAY:
-                a = other.a;
-                break;
-            case MAP:
-                m = other.m;
-                break;
-            default:
-                break;
         }
     }
     return *this;
@@ -119,35 +127,41 @@ bool ConfigValue::operator==(const bool &other) const
     return (type == BOOL) && (b == other);
 }
 
-std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
-    switch (cv.getType()) {
-        case INT:
-            os << cv.getInt();
-            break;
-        case BOOL:
-            os << (cv.getBool() ? "true" : "false");
-            break;
-        case STRING:
-            os << '"' << cv.getString() << '"';
-            break;
-        case ARRAY:
-            os << "[ ";
-            for (size_t i = 0; i < cv.getArray().size(); i++) {
-                if (i > 0) os << ", ";
-                os << (cv.getArray())[i];
-            }
-            os << " ]";
-            break;
-        case MAP:
-            os << "{ ";
-            for (config_map::const_iterator it = cv.getMap().begin(); it != cv.getMap().end(); ++it) {
-                if (it != cv.getMap().begin()) os << ", ";
-                os << it->first << ": " << it->second;
-            }
-            os << " }";
-            break;
-        default:
-            break;
+std::ostream &operator<<(std::ostream &os, const ConfigValue &cv)
+{
+    switch (cv.getType())
+    {
+    case INT:
+        os << cv.getInt();
+        break;
+    case BOOL:
+        os << (cv.getBool() ? "true" : "false");
+        break;
+    case STRING:
+        os << '"' << cv.getString() << '"';
+        break;
+    case ARRAY:
+        os << "[ ";
+        for (size_t i = 0; i < cv.getArray().size(); i++)
+        {
+            if (i > 0)
+                os << ", ";
+            os << (cv.getArray())[i];
+        }
+        os << " ]";
+        break;
+    case MAP:
+        os << "{ ";
+        for (config_map::const_iterator it = cv.getMap().begin(); it != cv.getMap().end(); ++it)
+        {
+            if (it != cv.getMap().begin())
+                os << ", ";
+            os << it->first << ": " << it->second;
+        }
+        os << " }";
+        break;
+    default:
+        break;
     }
     return os;
 }

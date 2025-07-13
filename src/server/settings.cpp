@@ -1,11 +1,14 @@
 #include "Server.hpp"
 
-/* 
-    Function to set a socket as non-blocking. This is useful for handling multiple clients.
-    
-    - In blocking mode, accept(), recv(), and send() will stop the program if no data is available. 
-    
-    - In non-blocking mode, the program continues running even if there’s no incoming connection or data.
+/*
+    Function to set a socket as non-blocking. This is useful for handling
+   multiple clients.
+
+    - In blocking mode, accept(), recv(), and send() will stop the program if no
+   data is available.
+
+    - In non-blocking mode, the program continues running even if there’s no
+   incoming connection or data.
 */
 
 // TODO: Move this to SocketHandler
@@ -21,8 +24,9 @@
 //     int keep_idle = 10;     // Start checking after 10 second of inactivity
 //     int keep_interval = 5;  // Send keep-alive probes every 5 second
 //     int keep_count = 3;     // Disconnect after 3 failed probes
-    
-//     setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
-//     setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));
-//     setsockopt(sock, IPPROTO_TCP, TCP_KEEPCNT, &keep_count, sizeof(keep_count));
+
+//     setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle,
+//     sizeof(keep_idle)); setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL,
+//     &keep_interval, sizeof(keep_interval)); setsockopt(sock, IPPROTO_TCP,
+//     TCP_KEEPCNT, &keep_count, sizeof(keep_count));
 // }
