@@ -125,9 +125,10 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
         // state change: headers parsed
     }
     if (headersComplete) {
-        if (addition.size() > (size_t) maxBodySize) { // TODO: max_header_size ?
+        if (body.size() > (size_t) maxBodySize) { // TODO: max_header_size ?
             // lots of bytes read, but still no body -> Bad Request
-            throw HttpRequestException(400);
+            // throw HttpRequestException(400);
+            return false;
         }
 
         return true;
@@ -149,7 +150,7 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
         // }
     }
     // Logger::debug("reading but not done");
-    return false;
+    return true;
 }
 
 std::string HttpRequest::normalizeUri(const std::string &uri) {

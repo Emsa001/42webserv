@@ -44,6 +44,7 @@ Server &SocketHandler::determineServer(HttpRequest &req, int port)
     return _servers[0];
 }
 
+// determines whether any open fd already points to given `port`
 bool SocketHandler::portTaken(int port)
 {
     for (std::map<int, int>::const_iterator it = _fds_to_ports.begin(); it != _fds_to_ports.end(); ++it)
@@ -187,12 +188,16 @@ void SocketHandler::processData(int i)
         it->revents = 0;
         // continue;//TODO
     }
-    bool complete = _conns[it->fd].request.feed(buffer, res, (_conns[it->fd].server ? _conns[it->fd].server->getConfig() : _servers[0].getConfig())); // TODO: get correct config
+
+    bool keep_reading =
+        _conns[it->fd].request.feed(buffer, res,
+                                    (_conns[it->fd].server ? _conns[it->fd].server->getConfig()
+                                                           : _servers[0].getConfig())); // TODO: get correct config
     Logger::debug("extended buffer");
     if (_conns[it->fd].request.getHeadersComplete())
         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
     // the config is just for max, is ok for now
-    if (!complete)
+    if (!_conns[it->fd].request.getHeadersComplete())
         // continue;//TODO
         return;
 
@@ -289,16 +294,12 @@ int SocketHandler::run()
             struct pollfd *it = &_pollfds[i];
             if (it->revents & POLLIN)
             {
-                // event was on socket
                 if (i < _num_sockets)
-                {
+                    // event was on socket
                     processConnection(i);
-                    // event was on open connection
-                }
                 else
-                {
+                    // event was on open connection
                     processData(i);
-                }
             }
             it->revents = 0;
         }
