@@ -65,7 +65,7 @@ bool SocketHandler::InitSockets()
     hints.ai_flags = AI_PASSIVE;     //
 
     // Group servers by port to handle virtual hosts
-    std::map<int, std::vector<size_t>> portToServers;
+    std::map<int, std::vector<size_t> > portToServers;
     for (size_t i = 0; i < _servers.size(); ++i)
     {
         std::string const port = Config::getSafe(_servers[i].getConfig(), "listen");
@@ -74,7 +74,7 @@ bool SocketHandler::InitSockets()
     }
 
     // Create sockets for each unique port
-    for (std::map<int, std::vector<size_t>>::iterator portIt = portToServers.begin(); portIt != portToServers.end();
+    for (std::map<int, std::vector<size_t> >::iterator portIt = portToServers.begin(); portIt != portToServers.end();
          ++portIt)
     {
         int port_int = portIt->first;
