@@ -19,16 +19,6 @@ class HttpURL {
         const StringMap &getQueryMap() const { return queryMap; }
 };
 
-struct ClientRequestState {
-    // connection data
-    int port;
-    // request data
-    std::string buffer;
-    bool headersParsed;
-    size_t contentLength;
-    size_t expectedSize;
-};
-
 class HttpRequest : public HttpMessage {
     private:
         HttpURL *url;
@@ -38,17 +28,24 @@ class HttpRequest : public HttpMessage {
         std::string port;
 
         std::string rawRequestData;
+        bool headersParsed;
+        std::string::size_type headerEnd;
 
         std::string normalizeUri(const std::string &uri);
 
+
     public:
-        HttpRequest(const std::string &rawData)
-            : url(NULL), rawRequestData(rawData) {
+        HttpRequest(const std::string &rawData="")
+            : url(NULL), rawRequestData(rawData), headersParsed(false),
+            headerEnd(std::string::npos) {
         }
 
         ~HttpRequest() { delete url; }
 
+        void parseHeaders(const config_map &serverConfig);
         void parse(const config_map &serverConfig);
+
+        void feed(const std::string & addition, const config_map &serverConfig);
 
         // --- Setters ---
         void setMethod(const std::string &m) { method = m; }
@@ -71,6 +68,20 @@ class HttpRequestException : public std::exception {
     public:
         explicit HttpRequestException(int statusCode) : statusCode(statusCode) {}
         int getStatusCode() const { return statusCode; }
+};
+
+
+struct ClientRequestState {
+    // connection data
+    int port;
+    bool keepalive;
+    // request data
+    HttpRequest request;
+
+    std::string buffer;
+    bool headersParsed;
+    size_t contentLength;
+    size_t expectedSize;
 };
 
 #endif

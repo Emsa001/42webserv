@@ -34,6 +34,10 @@ private:
     
     */
     // std::map<int, time_t> client_timestamps;
+
+    // connections are identified by their file descriptors
+    //  we store any state belonging to a connection (such as buffer)
+    //  in the ClientRequestState struct
     std::map<int, ClientRequestState> _conns;
 
     // TODO: Move this to SocketHandler

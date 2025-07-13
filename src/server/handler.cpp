@@ -25,7 +25,7 @@ SocketHandler::~SocketHandler()
 }
 
 Server & SocketHandler::determineServer(HttpRequest &req, int port) {
-    (void) req;
+    (void) req; // TODO: make use of 'Host' header
     for (size_t i=0; i<_servers.size(); ++i) {
         std::string const &listen = Config::getSafe(_servers[i].getConfig(), "listen", "").getString();
         if (stringToInt(listen) == port)
@@ -150,8 +150,10 @@ int SocketHandler::run()
                     newReq.port = _fds_to_ports[it->fd];
                     // std::cout << newReq.port <<
                     newReq.contentLength = 0;
+                    newReq.keepalive = false;
                     newReq.expectedSize = -1;
                     newReq.headersParsed = false;
+                    newReq.request = HttpRequest("");
                     newReq.buffer.clear();
 
                     // create new connection, consisting of request and pollfd
@@ -171,19 +173,22 @@ int SocketHandler::run()
                         it->revents = 0;
                         continue;
                     }
+                    _conns[it->fd].request.feed(buffer, _servers[0].getConfig()); // TODO: get correct config
                     _conns[it->fd].buffer.append(buffer, 0, res);
-                    
+                    _conns[it->fd].contentLength += res;
+
                     Logger::debug("extended buffer");
                     // shutdown(it->fd, 0); // no reads anymore
                     
                     std::cout << _conns[it->fd].buffer << std::endl;
                     
-                    HttpRequest request(_conns[it->fd].buffer);
-                    Server &s = determineServer(request, _conns[it->fd].port);
-                    request.parse(s.getConfig());
+                    // HttpRequest request(_conns[it->fd].buffer);
+                    Server &s = determineServer(_conns[it->fd].request, _conns[it->fd].port);
+                    // request.parse(s.getConfig());
                     
+
                     // set socket timeout if keep-alive is set
-                    std::string header_keepalive = request.getHeader("Keep-Alive");
+                    std::string header_keepalive = _conns[it->fd].request.getHeader("Keep-Alive");
                     if (!header_keepalive.empty()) {
                         size_t pos = header_keepalive.find("Timeout=");
                         header_keepalive.erase(pos, std::string("Timeout=").length());
@@ -193,11 +198,14 @@ int SocketHandler::run()
                         sock_timeout.tv_usec = 0;
                         try {
                             sock_timeout.tv_sec = stringToInt(header_keepalive);
+
+                            // ensure valid value
                             if (sock_timeout.tv_sec <= 0)
                                 throw HttpRequestException(400);
                             if (sock_timeout.tv_sec > MAX_KEEPALIVE)
                                 sock_timeout.tv_sec = MAX_KEEPALIVE;
                             Logger::debug("keepalive is " + intToString(sock_timeout.tv_sec));
+                            _conns[it->fd].keepalive = true;
                         } catch(std::exception &e) {
                             throw HttpRequestException(400);
                         }
@@ -210,7 +218,7 @@ int SocketHandler::run()
                     // figure out where to direct request
                     // Logger::info(intToString(_conns[it->fd].port));
                     // Server &s = determineServer(request, _conns[it->fd].port);
-                    HttpResponse response = s.handleResponse(&request);
+                    HttpResponse response = s.handleResponse(&_conns[it->fd].request);
                     // Logger::info(request.getMethod() + " " + request.getURI());
                     std::string responseStr = response.getResponse();
                     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0) {

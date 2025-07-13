@@ -1,5 +1,57 @@
 #include "HttpRequest.hpp"
 
+// returns position after headers
+void HttpRequest::parseHeaders(const config_map &serverConfig) {
+    int maxHeaderSize = Config::getSafe(serverConfig, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
+    // int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
+
+    // 1. Locate the end of the HTTP headers (marked by "\r\n\r\n")
+    headerEnd = rawRequestData.find("\r\n\r\n");
+    if (headerEnd == std::string::npos)
+        throw HttpRequestException(400);
+
+    std::string headerPart = rawRequestData.substr(0, headerEnd);
+
+    std::istringstream headerStream(headerPart);
+    std::string line;
+
+    // 2. Parse the request line to extract the HTTP method, URI, and version
+    std::getline(headerStream, line);
+    size_t totalHeaderSize = line.size();
+    if (totalHeaderSize > (size_t) maxHeaderSize) {
+        throw HttpRequestException(414);
+    }
+
+    std::istringstream lineStream(line);
+    lineStream >> this->method >> this->uri >> this->version;
+
+    this->url = new HttpURL(this->normalizeUri(this->uri));
+
+    // 3. Iterate through each header line, extracting key-value pairs and trimming whitespace
+    while (std::getline(headerStream, line) && line != "\r") {
+        if (line.empty() || line == "\r\n") break;
+
+        size_t pos = line.find(": ");
+        if (pos != std::string::npos) {
+            std::string key = line.substr(0, pos);
+            std::string value = line.substr(pos + 2);
+            key.erase(0, key.find_first_not_of(" \t\n\r"));
+            key.erase(key.find_last_not_of(" \t\n\r") + 1);
+            value.erase(0, value.find_first_not_of(" \t\n\r"));
+            value.erase(value.find_last_not_of(" \t\n\r") + 1);
+
+            // 5. Accumulate the total header size and throw exceptions if size limits are exceeded
+            totalHeaderSize += line.size();
+            this->setHeader(key, value);
+        }
+
+        if (totalHeaderSize > (size_t) maxHeaderSize) {
+            throw HttpRequestException(431);
+        }
+    }
+    headersParsed = true;
+}
+
 /**
  * @brief Parses the raw HTTP request data and populates the HttpRequest object.
  *
@@ -27,57 +79,17 @@
  * - The `url` member is initialized with the parsed URI.
  */
 void HttpRequest::parse(const config_map &serverConfig) {
-    int maxHeaderSize = Config::getSafe(serverConfig, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
+    // int maxHeaderSize = Config::getSafe(serverConfig, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
     int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
 
-    // 1. Locate the end of the HTTP headers (marked by "\r\n\r\n")
-    size_t headerEnd = rawRequestData.find("\r\n\r\n");
-    if (headerEnd == std::string::npos)
-        throw HttpRequestException(400);
+    // 1. parse headers in separate function - if not already done
+    if (!headersParsed)
+        parseHeaders(serverConfig);
 
     // 2. Split the request into header and body parts
-    std::string headerPart = rawRequestData.substr(0, headerEnd);
     std::string bodyPart = rawRequestData.substr(headerEnd + 4);
 
-    std::istringstream headerStream(headerPart);
-    std::string line;
-
-    // 3. Parse the request line to extract the HTTP method, URI, and version
-    std::getline(headerStream, line);
-    size_t totalHeaderSize = line.size();
-    if (totalHeaderSize > (size_t) maxHeaderSize) {
-        throw HttpRequestException(414);
-    }
-
-    std::istringstream lineStream(line);
-    lineStream >> this->method >> this->uri >> this->version;
-
-    this->url = new HttpURL(this->normalizeUri(this->uri));
-
-    // 4. Iterate through each header line, extracting key-value pairs and trimming whitespace
-    while (std::getline(headerStream, line) && line != "\r") {
-        if (line.empty() || line == "\r\n") break;
-
-        size_t pos = line.find(": ");
-        if (pos != std::string::npos) {
-            std::string key = line.substr(0, pos);
-            std::string value = line.substr(pos + 2);
-            key.erase(0, key.find_first_not_of(" \t\n\r"));
-            key.erase(key.find_last_not_of(" \t\n\r") + 1);
-            value.erase(0, value.find_first_not_of(" \t\n\r"));
-            value.erase(value.find_last_not_of(" \t\n\r") + 1);
-
-            // 5. Accumulate the total header size and throw exceptions if size limits are exceeded
-            totalHeaderSize += line.size();
-            this->setHeader(key, value);
-        }
-
-        if (totalHeaderSize > (size_t) maxHeaderSize) {
-            throw HttpRequestException(431);
-        }
-    }
-
-    // 6. For POST and DELETE methods, assign the body and check its size against the maximum allowed
+    // 3. For POST and DELETE methods, assign the body and check its size against the maximum allowed
     if (this->method == "POST" || this->method == "DELETE") {
         this->body = bodyPart;
         if (this->body.size() > (size_t) maxBodySize) {
@@ -92,6 +104,24 @@ void HttpRequest::parse(const config_map &serverConfig) {
                 throw HttpRequestException(400); // Content-Length mismatch
             }
         }
+    }
+}
+
+// Feed bytes from the buffer into the request
+// When the headers are complete, parse the headers
+void HttpRequest::feed(const std::string & addition, const config_map &serverConfig) {
+    rawRequestData.append(addition);
+
+    std::string::size_type res = rawRequestData.find("\r\n\r\n"); // TODO: maybe don't read all of it again?
+    bool headersEnded = res != std::string::npos;
+    if (headersEnded) {
+        parseHeaders(serverConfig);
+    } else {
+        if (addition.size() > 10000) { // TODO: max_header_size ?
+            // lots of bytes read, but still no body -> Bad Request
+            throw HttpRequestException(400);
+        }
+        // just wait for it
     }
 }
 

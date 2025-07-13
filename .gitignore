@@ -12,3 +12,5 @@ gtest/
 
 *.dSYM
 DS_Store
+
+todo.txt
