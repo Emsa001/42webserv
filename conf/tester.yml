@@ -2,8 +2,8 @@ log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([
 
 server0:
     server_name: "IntraTester"
-    listen: "80"
-    max_client_body_size: 1000
+    listen: 80
+    max_client_body_size: 1024
     max_client_header_size: 1024
     keep_alive: 30
 
@@ -11,14 +11,6 @@ server0:
         path: "/"
         root: "/tester/"
         methods: "GET"
-
-    location:
-        path: "/"
-        extension: ".bla"
-        root: "/tester/"
-        index: "run_tester.sh"
-        methods: "POST"
-        cgi: true
 
     location:
         path: "/put_test"
@@ -31,8 +23,22 @@ server0:
         methods: "POST"
 
     location:
-        path: "/directory"
+        path: "/directory/"
         index: "youpi.bad_extension"
         root: "/tester/YoupiBanane"
         methods: "GET"
+        autoindex: true
 
+    location:
+        path: "/directory/Yeah"
+        root: "/tester/YoupiBanane/Yeah"
+        methods: "GET"
+
+
+    # location:
+    #     path: "/"
+    #     extension: ".bla"
+    #     root: "/tester/"
+    #     index: "run_tester.sh"
+    #     methods: "POST"
+    #     cgi: true
