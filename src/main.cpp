@@ -15,7 +15,7 @@ int main()
 {
     try {
         Config &config = Config::instance();
-        config.parse("conf/default.yml");
+        config.parse("conf/tester.yml");
         
         Logger::init();
         SocketHandler sh(config.getServers());
