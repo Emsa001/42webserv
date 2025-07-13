@@ -34,7 +34,6 @@ class HttpRequest : public HttpMessage {
         std::string::size_type headerEnd;
 
         int content_length;
-        int length;
 
         std::string normalizeUri(const std::string &uri);
 
@@ -42,7 +41,7 @@ class HttpRequest : public HttpMessage {
     public:
         HttpRequest(const std::string &rawData="")
             : url(NULL), rawRequestData(rawData), headersComplete(false), bodyComplete(false),
-            headerEnd(std::string::npos), content_length(-1), length(0) {
+            headerEnd(std::string::npos), content_length(-1) {
         }
 
         ~HttpRequest() { delete url; }
@@ -64,7 +63,7 @@ class HttpRequest : public HttpMessage {
         HttpURL *getURL() const { return url; }
         const std::string &getPort() const { return port; }
         const std::string &getRawRequestData() const { return rawRequestData; }
-        int getBodyLength() { return length; }
+        int getBodyLength() { return body.size(); }
 
         
         bool getHeadersComplete() const { return headersComplete; }
@@ -85,6 +84,7 @@ struct ClientRequestState {
     // connection data
     int port;
     bool keepalive;
+    Server *server;
     // request data
     HttpRequest request;
 

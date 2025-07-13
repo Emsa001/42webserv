@@ -163,6 +163,7 @@ void SocketHandler::processConnection(int i)
     newReq.headersComplete = false;
     newReq.request = HttpRequest("");
     newReq.buffer.clear();
+    newReq.server = NULL;
 
     // create new connection, consisting of request and pollfd
     _conns[newconn.fd] = newReq;
@@ -186,7 +187,7 @@ void SocketHandler::processData(int i)
         it->revents = 0;
         // continue;//TODO
     }
-    bool complete = _conns[it->fd].request.feed(buffer, res, _servers[0].getConfig()); // TODO: get correct config
+    bool complete = _conns[it->fd].request.feed(buffer, res, (_conns[it->fd].server ? _conns[it->fd].server->getConfig() : _servers[0].getConfig())); // TODO: get correct config
     Logger::debug("extended buffer");
     if (_conns[it->fd].request.getHeadersComplete())
         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
@@ -198,7 +199,7 @@ void SocketHandler::processData(int i)
     Logger::debug(_conns[it->fd].request.getRawRequestData());
 
     // figure out where to direct request
-    Server &s = determineServer(_conns[it->fd].request, _conns[it->fd].port);
+    _conns[i].server = &determineServer(_conns[it->fd].request, _conns[it->fd].port);
 
     // set socket timeout if keep-alive is set
     std::string header_keepalive = _conns[it->fd].request.getHeader("keep-alive");
@@ -238,9 +239,9 @@ void SocketHandler::processData(int i)
     // if (!_conns[it->fd].keepalive)
     //     shutdown(it->fd, 0); // no reads anymore
 
-    HttpResponse response = s.handleResponse(&_conns[it->fd].request);
+    HttpResponse response = _conns[i].server->handleResponse(&_conns[it->fd].request);
     if (response.isInvalid()) // TODO: wait until request.isBodyComplete()
-        return ;
+        return;
     std::string responseStr = response.getResponse();
 
     if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)

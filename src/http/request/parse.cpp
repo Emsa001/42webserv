@@ -50,14 +50,10 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
         }
     }
 
-    if (getHeader("Content-Length").empty())
-        content_length = -1;
-    else {
-        // Logger::debug("clen is " + getHeader("Content-Length"));
-        content_length = stringToInt(getHeader("Content-Length"));
-        // Logger::debug("clen is " + intToString(content_length));
-        // Logger::debug("done parsing headers");
-    }
+    content_length = 0;
+    if (!getHeader("Content-Length").empty())
+        content_length = stringToInt(getHeader("content-cength"));
+
     headersComplete = true;
 }
 
@@ -119,6 +115,7 @@ void HttpRequest::parse(const config_map &serverConfig) {
 // Feed bytes from the buffer into the request
 // When the headers are complete, parse the headers
 bool HttpRequest::feed(const std::string & addition, size_t len, const config_map &serverConfig) {
+    int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
     rawRequestData.append(addition.substr(0, len));
 
     std::string::size_type res = rawRequestData.find("\r\n\r\n"); // TODO: maybe don't read all of it again?
@@ -128,7 +125,7 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
         // state change: headers parsed
     }
     if (headersComplete) {
-        if (addition.size() > 10000) { // TODO: max_header_size ?
+        if (addition.size() > (size_t) maxBodySize) { // TODO: max_header_size ?
             // lots of bytes read, but still no body -> Bad Request
             throw HttpRequestException(400);
         }
