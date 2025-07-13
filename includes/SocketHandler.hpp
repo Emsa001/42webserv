@@ -82,6 +82,9 @@ public:
 
     bool InitSockets();
     int run();
+
+    void processConnection(int i);
+    void processData(int i);
 };
 
 #endif // SOCKETHANDLER_HPP
