@@ -207,7 +207,7 @@ void SocketHandler::processData(int i)
     config_map conn_serv = _conns[it->fd].server ? _conns[it->fd].server->getConfig() : _servers[0].getConfig();
     _conns[it->fd].request.feed(buffer, res, conn_serv);
 
-    Logger::debug("extended buffer");
+    // Logger::debug("extended buffer");
     if (_conns[it->fd].request.getHeadersComplete())
         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
     else
@@ -224,7 +224,7 @@ void SocketHandler::processData(int i)
     {
         int keep_alive = Config::getSafe(_conns[it->fd].server->getConfig(), "keep_alive", 0);
 
-        Logger::debug("keepalive is " + intToString(keep_alive));
+        // Logger::debug("keepalive is " + intToString(keep_alive));
         _conns[it->fd].keepalive = keep_alive;
 
         setConnectionTimeout(it->fd, keep_alive);
@@ -252,7 +252,7 @@ void SocketHandler::sendChunk(int i) {
         closeConnection(i);
     }
     _conns[_pollfds[i].fd].response.erase(0, res);
-    Logger::debug("sending response");
+    // Logger::debug("sending response");
 
     // reset request
     // ready for new request on same connection
