@@ -21,17 +21,19 @@ HttpResponse Server::handleResponse(HttpRequest *request)
 
     HttpResponse response(request, this->config);
     std::string connectionHeader = "close";
-
+    
     try
     {
+        request->parseHeaders(this->config);
         // Set the "Connection" header based on the request
         response.setHeader("Connection", request->getHeader("Connection") == "close" ? "close" : "keep-alive");
-
+        
         // Find the location
         const config_map *location = this->findLocation(request->getURL()->getPath());
         if (location == NULL)
-            throw HttpRequestException(404); // No matching location found
-            
+        throw HttpRequestException(404); // No matching location found
+        
+        request->parse(this->config, *location);
         // Check if redirection
         if (this->isRedirect(response, *location))
             return response;
@@ -44,7 +46,6 @@ HttpResponse Server::handleResponse(HttpRequest *request)
         if (!fileData.exists)
             throw HttpRequestException(404);
 
-        request->parse(this->config, *location);
         // Validate the method
         if (!this->isValidMethod(request, *location))
             throw HttpRequestException(405);
