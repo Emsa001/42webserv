@@ -204,47 +204,30 @@ void SocketHandler::processData(int i)
     Logger::debug(_conns[it->fd].request.getRawRequestData());
 
     // figure out where to direct request
-    _conns[i].server = &determineServer(_conns[it->fd].request, _conns[it->fd].port);
+    _conns[it->fd].server = &determineServer(_conns[it->fd].request, _conns[it->fd].port);
 
     // set socket timeout if keep-alive is set
-    std::string header_keepalive = _conns[it->fd].request.getHeader("keep-alive");
-    if (!header_keepalive.empty())
+    std::string connection_header = _conns[it->fd].request.getHeader("connection");
+    if (!connection_header.empty())
     {
-        size_t pos = header_keepalive.find("Timeout=");
-        if (pos != std::string::npos)
-        {
-            header_keepalive.erase(pos, std::string("Timeout=").length());
-            Logger::debug("Header 'Keep-Alive: " + header_keepalive + "'");
+        int keep_alive = Config::getSafe(_conns[it->fd].server->getConfig(), "keep_alive", 0);
 
-            struct timeval sock_timeout;
-            sock_timeout.tv_usec = 0;
-            try
-            {
-                sock_timeout.tv_sec = stringToInt(header_keepalive);
+        Logger::debug("keepalive is " + intToString(keep_alive));
+        _conns[it->fd].keepalive = keep_alive;
 
-                // ensure valid value
-                if (sock_timeout.tv_sec <= 0)
-                    throw HttpRequestException(400);
-                if (sock_timeout.tv_sec > MAX_KEEPALIVE)
-                    sock_timeout.tv_sec = MAX_KEEPALIVE;
-                Logger::debug("keepalive is " + intToString(sock_timeout.tv_sec));
-                _conns[it->fd].keepalive = true;
-            }
-            catch (std::exception &e)
-            {
-                throw HttpRequestException(400);
-            }
-            int optval = 0;
-            setsockopt(it->fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
-            setsockopt(it->fd, SOL_SOCKET, SO_RCVTIMEO, &sock_timeout, sizeof(sock_timeout));
-            setsockopt(it->fd, SOL_SOCKET, SO_SNDTIMEO, &sock_timeout, sizeof(sock_timeout));
-        }
+        struct timeval sock_timeout;
+        sock_timeout.tv_usec = 0;
+        sock_timeout.tv_sec = keep_alive;
+        int optval = 0;
+        setsockopt(it->fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+        setsockopt(it->fd, SOL_SOCKET, SO_RCVTIMEO, &sock_timeout, sizeof(sock_timeout));
+        setsockopt(it->fd, SOL_SOCKET, SO_SNDTIMEO, &sock_timeout, sizeof(sock_timeout));
     }
 
     // if (!_conns[it->fd].keepalive)
     //     shutdown(it->fd, 0); // no reads anymore
 
-    HttpResponse response = _conns[i].server->handleResponse(&_conns[it->fd].request);
+    HttpResponse response = _conns[it->fd].server->handleResponse(&_conns[it->fd].request);
     if (response.isInvalid()) // TODO: wait until request.isBodyComplete()
         return;
     std::string responseStr = response.getResponse();
