@@ -15,13 +15,14 @@ private:
     bool isValidMethod(HttpRequest *request, const config_map &location);
     bool isRedirect(HttpResponse &response, const config_map &location);
 
-    const FileData createFileData(const config_map *location, HttpRequest *request) const;
+    const FileData createFileData(const config_map *location, std::string path) const;
 
 public:
     Server(const config_map &config) : config(config) {}
     ~Server() {}
 
     const config_map *findLocation(const std::string &path);
+    const config_map *findByExtension(const std::string &path);
     // TODO: Move this to SocketHandler
     void closeConnection(int *client_sock);
 

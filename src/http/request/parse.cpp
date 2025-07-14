@@ -83,9 +83,11 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
  * - The `headers` map is populated with parsed header fields.
  * - The `url` member is initialized with the parsed URI.
  */
-void HttpRequest::parse(const config_map &serverConfig) {
+void HttpRequest::parse(const config_map &serverConfig, const config_map &location) {
     // int maxHeaderSize = Config::getSafe(serverConfig, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
-    int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
+    int maxBodySize = Config::getSafe(location, "max_client_body_size", -1).getInt();
+    if(maxBodySize < 0)
+        maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
 
     // 1. parse headers in separate function - if not already done
     if (!headersComplete)

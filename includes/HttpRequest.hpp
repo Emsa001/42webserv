@@ -47,7 +47,7 @@ class HttpRequest : public HttpMessage {
         ~HttpRequest() { delete url; }
 
         void parseHeaders(const config_map &serverConfig);
-        void parse(const config_map &serverConfig);
+        void parse(const config_map &serverConfig, const config_map &location);
 
         bool feed(const std::string & addition, size_t len, const config_map &serverConfig);
 
