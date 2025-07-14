@@ -62,6 +62,7 @@ ConfigSchema createSchema()
     locationSchema.addEntry("autoindex", BOOL, false);
     locationSchema.addEntry("upload_path", STRING, false);
     locationSchema.addEntry("extension", STRING, false);
+    locationSchema.addEntry("max_client_body_size", NUMBER(1, INT32_MAX), false);
 
     locationSchema.addEntry("cgi", BOOL, false);
 
