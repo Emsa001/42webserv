@@ -32,11 +32,16 @@ HttpResponse Server::handleResponse(HttpRequest *request)
         const config_map *location = this->findLocation(request->getURL().getPath());
         if (location == NULL)
             throw HttpRequestException(404); // No matching location found
-        
+            
+        // Validate the method
+        if (!this->isValidMethod(request, *location))
+            throw HttpRequestException(405);
+    
         request->parse(this->config, *location);
+
         // Check if redirection
         if (this->isRedirect(response, *location))
-            return response;
+        return response;
 
         // Attempt to create file data for the requested resource
         FileData fileData = this->createFileData(location, request->getURL().getPath());
@@ -46,9 +51,6 @@ HttpResponse Server::handleResponse(HttpRequest *request)
         if (!fileData.exists)
             throw HttpRequestException(404);
 
-        // Validate the method
-        if (!this->isValidMethod(request, *location))
-            throw HttpRequestException(405);
 
 
         if (!request->getHeader("content-length").empty() &&

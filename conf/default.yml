@@ -49,7 +49,7 @@ server1:
     location:
         path: "/"
         root: "/myserver1/"
-        methods: "GET"
+        methods: "GET POST"
     
     location:
         path: "/redirect"

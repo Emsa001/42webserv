@@ -233,7 +233,7 @@ void SocketHandler::processData(int i)
     // if (!_conns[it->fd].keepalive)
     //     shutdown(it->fd, 0); // no reads anymore
 
-    // handle and store respose to be sent later
+    // handle and store response to be sent later
     HttpResponse response = _conns[it->fd].server->handleResponse(&_conns[it->fd].request);
     if (response.isInvalid())
         return;
