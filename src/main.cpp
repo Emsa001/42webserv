@@ -13,10 +13,10 @@ int main()
 
         Logger::init();
         SocketHandler sh(config.getServers());
-        sh.run();
+        int status = sh.run();
         Logger::destroy();
 
-        return 0;
+        return status;
     }
     catch (const std::exception &e)
     {

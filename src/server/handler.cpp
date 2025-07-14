@@ -269,6 +269,7 @@ void SocketHandler::sendChunk(int i) {
 void SocketHandler::closeConnection(int i)
 {
     close(_pollfds[i].fd);
+    _fds_to_ports.erase(_pollfds[i].fd);
     _conns.erase(_pollfds[i].fd);
     _pollfds.erase(_pollfds.begin() + i);
     Logger::debug("closed connection");
@@ -277,7 +278,7 @@ void SocketHandler::closeConnection(int i)
 int SocketHandler::run()
 {
     if (!InitSockets())
-        return -1;
+        return 1;
 
     // Server main control loop
     while (!stop)
@@ -314,4 +315,5 @@ int SocketHandler::run()
             _pollfds[i].revents = 0;
         }
     }
+    return 0;
 }
