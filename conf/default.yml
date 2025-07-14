@@ -12,7 +12,7 @@
 log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
 
 server0:
-    server_name: "MainServer"
+    server_name: "localhost"
     listen: "80"
     max_client_body_size: 4096
     max_client_header_size: 1024
@@ -44,7 +44,7 @@ server0:
         methods: "GET"
 
 server1:
-    server_name: "MyServer1"
+    server_name: "localhost"
     listen: "8080"
     max_client_body_size: 4096
     max_client_header_size: 1024
@@ -66,7 +66,7 @@ server1:
         404: "myserver1/errors/404.html"
 
 server2:
-    server_name: "MyServer2"
+    server_name: "localhost"
     listen: "8081"
     max_client_body_size: 256
     max_client_header_size: 1024
@@ -101,7 +101,7 @@ server2:
         404: ".mbnmk"
 
 server3:
-    server_name: "MyServer3"
+    server_name: "localhost"
     listen: "8082"
     max_client_body_size: 16384
     max_client_header_size: 2048

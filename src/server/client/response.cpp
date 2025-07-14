@@ -31,7 +31,7 @@ HttpResponse Server::handleResponse(HttpRequest *request)
         // Find the location
         const config_map *location = this->findLocation(request->getURL()->getPath());
         if (location == NULL)
-        throw HttpRequestException(404); // No matching location found
+            throw HttpRequestException(404); // No matching location found
         
         request->parse(this->config, *location);
         // Check if redirection

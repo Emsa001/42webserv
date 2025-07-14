@@ -40,7 +40,7 @@ server:
         500: "500.html"
 
 server2:
-    server_name: "pabeckha"
+    server_name: "localhost"
     listen: 81
     max_client_body_size: 1024
     max_client_header_size: 512
