@@ -133,7 +133,7 @@ void SocketHandler::processConnection(int i)
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof(addr);
     struct pollfd newconn;
-    newconn.events = POLLIN;
+    newconn.events = POLLIN | POLLERR | POLLHUP | POLLNVAL;
     newconn.revents = 0;
     newconn.fd = accept(it->fd, (sockaddr *)&addr, &addrlen);
     if (newconn.fd < 0)
@@ -141,6 +141,7 @@ void SocketHandler::processConnection(int i)
         perror("error5: ");
         Logger::error("accept() error");
         // continue;//TODO
+        return;
     }
     // TODO: get port (getsockname) and store in newconn
     // std::cout << newconn.fd << std::endl;
@@ -181,18 +182,19 @@ void SocketHandler::processData(int i)
     char buffer[READ_BUFFER_SIZE];
     int res = recv(it->fd, buffer, sizeof(buffer), 0);
     // TODO: error check `res`
-    if (res < 0)
+    if (res <= 0)
     {
         Logger::error("recv() error");
         // std::cout << it->fd << std::endl;
         it->revents = 0;
+        closeConnection(i);
+        return;
         // continue;//TODO
     }
 
-    bool keep_reading =
-        _conns[it->fd].request.feed(buffer, res,
-                                    (_conns[it->fd].server ? _conns[it->fd].server->getConfig()
-                                                           : _servers[0].getConfig())); // TODO: get correct config
+    config_map conn_serv = _conns[it->fd].server ? _conns[it->fd].server->getConfig() : _servers[0].getConfig();
+    _conns[it->fd].request.feed(buffer, res, conn_serv);
+
     Logger::debug("extended buffer");
     if (_conns[it->fd].request.getHeadersComplete())
         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
@@ -245,16 +247,22 @@ void SocketHandler::processData(int i)
     _conns[it->fd].request = HttpRequest();
     if (!_conns[it->fd].keepalive)
     {
-        close(it->fd);
-        _conns.erase(it->fd);
-        _pollfds.erase(_pollfds.begin() + i);
-        Logger::debug("closed connection");
+        closeConnection(i);
     }
     if (res <= 0)
     {
         Logger::info("removing");
         perror("error2: ");
     }
+}
+
+void SocketHandler::closeConnection(int i)
+{
+
+    close(_pollfds[i].fd);
+    _conns.erase(_pollfds[i].fd);
+    _pollfds.erase(_pollfds.begin() + i);
+    Logger::debug("closed connection");
 }
 
 int SocketHandler::run()
@@ -274,8 +282,7 @@ int SocketHandler::run()
         // Looping backwards to prevent iterator invalidation
         for (int i = _pollfds.size() - 1; i >= 0; --i)
         {
-            struct pollfd *it = &_pollfds[i];
-            if (it->revents & POLLIN)
+            if (_pollfds[i].revents & POLLIN)
             {
                 if (i < _num_sockets)
                     // event was on socket
@@ -283,8 +290,20 @@ int SocketHandler::run()
                 else
                     // event was on open connection
                     processData(i);
+                // clear events if connection not yet closed
+                _pollfds[i].revents = 0;
             }
-            it->revents = 0;
+            else if (_pollfds[i].revents & POLLERR)
+            {
+                if (i < _num_sockets)
+                    ;
+                // event was on socket
+                // processConnection(i);
+                else
+                    // event was on open connection
+                    // processData(i);
+                    closeConnection(i);
+            }
         }
     }
 }
