@@ -55,6 +55,7 @@ public:
 
     void processConnection(int i);
     void processData(int i);
+    void closeConnection(int i);
 };
 
 #endif // SOCKETHANDLER_HPP

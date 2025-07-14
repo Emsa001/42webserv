@@ -26,7 +26,7 @@ HttpResponse Server::handleResponse(HttpRequest *request)
     {
         request->parseHeaders(this->config);
         // Set the "Connection" header based on the request
-        response.setHeader("Connection", request->getHeader("Connection") == "close" ? "close" : "keep-alive");
+        response.setHeader("Connection", request->getHeader("Connection") == "keep-alive" ? "keep-alive" : "close");
         
         // Find the location
         const config_map *location = this->findLocation(request->getURL()->getPath());
