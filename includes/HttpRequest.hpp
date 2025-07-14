@@ -44,7 +44,9 @@ class HttpRequest : public HttpMessage {
             headerEnd(std::string::npos), content_length(-1) {
         }
 
-        ~HttpRequest() { delete url; }
+        virtual ~HttpRequest() { 
+            delete this->url; 
+        }
 
         void parseHeaders(const config_map &serverConfig);
         void parse(const config_map &serverConfig, const config_map &location);

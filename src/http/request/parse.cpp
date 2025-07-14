@@ -20,6 +20,8 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
     std::istringstream lineStream(line);
     lineStream >> this->method >> this->uri >> this->version;
 
+    if(this->url)
+        delete this->url; // Clean up previous URL if it exists
     this->url = new HttpURL(this->normalizeUri(this->uri));
 
     // 3. Iterate through each header line, extracting key-value pairs and trimming whitespace

@@ -51,7 +51,8 @@ class HttpResponse : public HttpMessage {
 
         HttpResponse(): invalid(true) {}
 
-        ~HttpResponse() {}
+        ~HttpResponse() {
+        }
 
         // --- Core response methods ---
 

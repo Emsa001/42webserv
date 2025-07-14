@@ -239,6 +239,7 @@ void SocketHandler::processData(int i)
     if (response.isInvalid()) // TODO: wait until request.isBodyComplete()
         return;
     _conns[it->fd].response = response.getResponse();
+    delete response.getRequest()->getURL();
 }
 
 void SocketHandler::sendChunk(int i) {
@@ -281,7 +282,7 @@ int SocketHandler::run()
         return -1;
 
     // Server main control loop
-    while (true)
+    while (!stop)
     {
         if (poll((struct pollfd *)_pollfds.data(), _pollfds.size(), -1) < 0)
         {

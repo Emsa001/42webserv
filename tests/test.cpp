@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <Webserv.hpp>
 
+bool stop = false;
+
 int main(int argc, char *argv[])
 {
 	testing::InitGoogleTest(&argc, argv);
