@@ -9,7 +9,7 @@ int main()
     {
         signal(SIGINT, signalHandler);
         Config &config = Config::instance();
-        config.parse("conf/tester.yml");
+        config.parse("conf/default.yml");
 
         Logger::init();
         SocketHandler sh(config.getServers());

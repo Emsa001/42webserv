@@ -12,6 +12,7 @@
 #define ROOT_DIR "./www/"
 #define ALLOWED_METHODS "GET POST DELETE"
 #define DEFAULT_SOCKET_TIMEOUT 30
+#define CGI_TIMEOUT 3
 
 #include "Colors.hpp"
 
@@ -22,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h> 
+#include <sys/time.h>
 #include <netdb.h>
 
 // network headers (for TCP)

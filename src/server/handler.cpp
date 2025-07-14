@@ -213,7 +213,7 @@ void SocketHandler::processData(int i)
     else
         return;
 
-    Logger::debug(_conns[it->fd].request.getRawRequestData());
+    // Logger::debug(_conns[it->fd].request.getRawRequestData());
 
     // figure out where to direct request
     _conns[it->fd].server = &determineServer(_conns[it->fd].request, _conns[it->fd].port);

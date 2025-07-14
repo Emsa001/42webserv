@@ -18,6 +18,7 @@ const FileData Server::createFileData(const config_map *location, std::string pa
 
     if(fullPath[fullPath.size() - 1] != '/' && locationPath == path){
         std::string index = Config::getSafe(*location, "index", (std::string)"index.html").getString();
+        std::cout << "Adding index: " << index << std::endl;
         fullPath += "/" + index;
     }
 

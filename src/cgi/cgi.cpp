@@ -5,11 +5,20 @@ static char *str_char(const std::string &str)
     return const_cast<char *>(str.c_str());
 }
 
+// Get current time in seconds
+static time_t get_current_time()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec;
+}
+
 std::string read_output(int pipe_fd)
 {
     char buffer[1024];
     std::stringstream response;
     ssize_t bytesRead;
+    
     while ((bytesRead = read(pipe_fd, buffer, sizeof(buffer) - 1)) > 0)
     {
         buffer[bytesRead] = '\0';
@@ -104,11 +113,90 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         if (!body.empty())
             write(input_pipe[1], body.c_str(), body.size());
     }
+    
+    close(input_pipe[1]); // Close write end of input pipe
 
-    std::string output = close_pipes(output_pipe, input_pipe, false);
-
+    // Record start time for timeout
+    time_t start_time = get_current_time();
+    bool timeout_occurred = false;
     int status;
-    waitpid(pid, &status, 0);
+    std::string output;
+
+    // Wait for child process with timeout
+    while (true)
+    {
+        // Check if server is being stopped
+        if (stop)
+        {
+            // Server shutdown requested, terminate CGI immediately
+            kill(pid, 9);
+            waitpid(pid, &status, 0);
+            close(output_pipe[0]);
+            close(input_pipe[0]);
+            throw HttpRequestException(503); // Service Unavailable
+        }
+        
+        pid_t result = waitpid(pid, &status, WNOHANG);
+        
+        if (result == pid)
+        {
+            // Child process has finished
+            break;
+        }
+        else if (result == 0)
+        {
+            // Child is still running, check timeout
+            time_t current_time = get_current_time();
+            if (current_time - start_time >= CGI_TIMEOUT)
+            {
+                timeout_occurred = true;
+                break;
+            }
+            // Brief sleep to avoid busy waiting
+            usleep(10000); // 10ms
+        }
+        else
+        {
+            // Error in waitpid
+            close(output_pipe[0]);
+            close(input_pipe[0]);
+            throw HttpRequestException(500);
+        }
+    }
+
+    if (timeout_occurred)
+    {
+        // Terminate the child process if timeout occurred
+        // First, close our ends of the pipes to signal the child
+        close(output_pipe[0]);
+        close(input_pipe[0]);
+        
+        // Wait briefly to see if the child terminates on its own
+        // when it detects the closed pipes
+        time_t term_start = get_current_time();
+        while (get_current_time() - term_start < 1)
+        {
+            pid_t result = waitpid(pid, &status, WNOHANG);
+            if (result == pid)
+            {
+                // Process terminated on its own
+                throw HttpRequestException(504); // Gateway Timeout
+            }
+            usleep(50000); // 50ms
+        }
+        
+        // If process is still running, we have no choice but to force kill it
+        // This is unavoidable for truly infinite loops
+        kill(pid, 9); // Use raw signal number instead of SIGKILL
+        waitpid(pid, &status, 0);
+        throw HttpRequestException(504); // Gateway Timeout
+    }
+
+    // Read output from child process
+    output = read_output(output_pipe[0]);
+    
+    close(output_pipe[0]);
+    close(input_pipe[0]);
 
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
         throw HttpRequestException(500);
