@@ -203,6 +203,7 @@ void SocketHandler::processData(int i)
         return;
     }
 
+    // todo: build exception HttpResponse if occurs in feed()
     config_map conn_serv = _conns[it->fd].server ? _conns[it->fd].server->getConfig() : _servers[0].getConfig();
     _conns[it->fd].request.feed(buffer, res, conn_serv);
 

@@ -2,8 +2,8 @@
 
 // returns position after headers
 void HttpRequest::parseHeaders(const config_map &serverConfig) {
-    int maxHeaderSize = Config::getSafe(serverConfig, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE).getInt();
-    // int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
+    int maxBodySize = Config::getSafe(serverConfig, "max_client_body_size", DEFAULT_MAX_BODY_SIZE).getInt();
+    (void) maxBodySize;
 
     // 1. Locate the end of the HTTP headers (marked by "\r\n\r\n")
     headerEnd = rawRequestData.find("\r\n\r\n");
@@ -14,14 +14,9 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
 
     std::istringstream headerStream(headerPart);
     std::string line;
-
     // 2. Parse the request line to extract the HTTP method, URI, and version
     std::getline(headerStream, line);
     size_t totalHeaderSize = line.size();
-    if (totalHeaderSize > (size_t) maxHeaderSize) {
-        throw HttpRequestException(414);
-    }
-
     std::istringstream lineStream(line);
     lineStream >> this->method >> this->uri >> this->version;
 
@@ -43,10 +38,6 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
             // 5. Accumulate the total header size and throw exceptions if size limits are exceeded
             totalHeaderSize += line.size();
             this->setHeader(key, value);
-        }
-
-        if (totalHeaderSize > (size_t) maxHeaderSize) {
-            throw HttpRequestException(431);
         }
     }
 
@@ -125,13 +116,13 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
     }
     if (headersComplete) {
         std::string bodyPart = rawRequestData.substr(headerEnd + 4);
-        if (bodyPart.size() > (size_t) maxBodySize) { // TODO: max_header_size ?
+        if (bodyPart.size() > (size_t) maxBodySize || rawRequestData.size() > REQUEST_SIZE_LIMIT) {
             // lots of bytes read, but still no body -> Bad Request
             // throw HttpRequestException(400);
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
 
         // length = bodyPart.size();
         // // std::cout << bodyPart << std::endl;
@@ -149,7 +140,7 @@ bool HttpRequest::feed(const std::string & addition, size_t len, const config_ma
         // }
     }
     // Logger::debug("reading but not done");
-    return true;
+    return false;
 }
 
 std::string HttpRequest::normalizeUri(const std::string &uri) {
