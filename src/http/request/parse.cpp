@@ -92,8 +92,8 @@ void HttpRequest::parse(const config_map &serverConfig, const config_map &locati
         if (this->body.size() > (size_t) maxBodySize) {
             throw HttpRequestException(413);
         }
-        if(this->body.size() > 0 && this->getHeader("Content-Length") == "") {
-            throw HttpRequestException(400); // Content-Length header is required for POST/DELETE with body
+        if(this->body.size() > 0 && content_length == 0) {//->getHeader("Content-Length") == "") {
+            throw HttpRequestException(405); // Content-Length header is required for POST/DELETE with body
         }
         else if (this->getHeader("Content-Length") != "") {
             size_t contentLength = stringToInt(this->getHeader("Content-Length"));

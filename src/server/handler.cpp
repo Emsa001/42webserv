@@ -210,9 +210,7 @@ void SocketHandler::processData(int i)
     Logger::debug("extended buffer");
     if (_conns[it->fd].request.getHeadersComplete())
         Logger::info(_conns[it->fd].request.getMethod() + " " + _conns[it->fd].request.getURI());
-    // the config is just for max, is ok for now
-    if (!_conns[it->fd].request.getHeadersComplete())
-        // continue;//TODO
+    else
         return;
 
     Logger::debug(_conns[it->fd].request.getRawRequestData());
@@ -235,8 +233,9 @@ void SocketHandler::processData(int i)
     // if (!_conns[it->fd].keepalive)
     //     shutdown(it->fd, 0); // no reads anymore
 
+    // handle and store respose to be sent later
     HttpResponse response = _conns[it->fd].server->handleResponse(&_conns[it->fd].request);
-    if (response.isInvalid()) // TODO: wait until request.isBodyComplete()
+    if (response.isInvalid())
         return;
     _conns[it->fd].response = response.getResponse();
     delete response.getRequest()->getURL();
