@@ -4,7 +4,6 @@ server0:
     server_name: "localhost"
     listen: "80"
     keep_alive: 30
-
     location:
         path: "/"
         root: "/tester/"
@@ -22,10 +21,18 @@ server0:
         max_client_body_size: 100
 
     location:
+        path: "/"
+        extension: ".bla"
+        root: "/tester/"
+        index: "run_tester.sh"
+        methods: "GET POST"
+        cgi: true
+
+    location:
         path: "/directory"
         index: "youpi.bad_extension"
         root: "/tester/YoupiBanane/"
-        methods: "GET"
+        methods: "GET POST"
         autoindex: true
 
     location:
@@ -33,10 +40,3 @@ server0:
         root: "/tester/YoupiBanane/Yeah/"
         methods: "GET"
 
-    location:
-        path: "/"
-        extension: ".bla"
-        root: "/tester/"
-        index: "ubuntu_cgi_tester"
-        methods: "POST"
-        cgi: true

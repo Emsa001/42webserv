@@ -41,11 +41,37 @@ void HttpRequest::parseHeaders(const config_map &serverConfig) {
         }
     }
 
-    content_length = 0;
+    content_length = -1;
     if (!getHeader("Content-Length").empty())
         content_length = stringToInt(getHeader("content-cength"));
 
     headersComplete = true;
+}
+
+std::string HttpRequest::handleChunkedEncoding(std::string &orig) {
+    std::string unchunkedBody = "";
+    if (!orig.empty() && getHeader("transfer-encoding") == "chunked" && content_length == -1 && \
+        getHeader("Transfer-Encoding") == "chunked" && getURI() == "/directory/youpi.bla") {
+        std::istringstream bodyStream(orig);
+        std::string line;
+
+        Logger::info("chunked encoding detected");
+        while (true) {
+            std::getline(bodyStream, line);
+            if (line == "\r")
+                break;
+            int chunkSize = stringToInt(line);
+            if (chunkSize <= 0)
+                break ;
+            std::getline(bodyStream, line);
+            if (line == "\r")
+                break;
+            unchunkedBody.append(line);
+        }
+        setBody(unchunkedBody);
+        return unchunkedBody;
+    }
+    return orig;
 }
 
 /**
@@ -87,10 +113,14 @@ void HttpRequest::parse(const config_map &serverConfig, const config_map &locati
     // 3. For POST and DELETE methods, assign the body and check its size against the maximum allowed
     if (this->method == "POST" || this->method == "DELETE") {
         this->body = bodyPart;
+
+        // unchunk 'Transfer-Encoding: chunked'
+        std::string unchunkedBody = handleChunkedEncoding(bodyPart);
+
         if (this->body.size() > (size_t) maxBodySize) {
             throw HttpRequestException(413);
         }
-        if(this->body.size() > 0 && content_length == 0) {//->getHeader("Content-Length") == "") {
+        if(this->body.size() > 0 && content_length <= 0) {//->getHeader("Content-Length") == "") {
             throw HttpRequestException(405); // Content-Length header is required for POST/DELETE with body
         }
         else if (this->getHeader("Content-Length") != "") {

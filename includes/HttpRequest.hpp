@@ -65,6 +65,8 @@ class HttpRequest : public HttpMessage {
         const std::string &getRawRequestData() const { return rawRequestData; }
         int getBodyLength() { return body.size(); }
 
+        std::string handleChunkedEncoding(std::string &chunked);
+
         
         bool getHeadersComplete() const { return headersComplete; }
         bool getBodyComplete() const { return bodyComplete; }

@@ -238,6 +238,7 @@ void SocketHandler::processData(int i)
     if (response.isInvalid())
         return;
     _conns[it->fd].response = response.getResponse();
+    Logger::info("Status: " + intToString(response.getStatusCode()));
 }
 
 void SocketHandler::sendChunk(int i) {
