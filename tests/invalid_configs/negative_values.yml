@@ -2,11 +2,10 @@
 server0:
     server_name: "NegativeValuesServer"
     listen: "8080"
-    max_client_body_size: -1
-    max_client_header_size: 1024
     keep_alive: 30
 
     location:
         path: "/"
+        max_client_body_size: -1
         root: "/negative/"
         methods: "GET"

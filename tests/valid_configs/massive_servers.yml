@@ -4,8 +4,6 @@ log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([
 server0:
     server_name: "Server0"
     listen: "8000"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -15,8 +13,6 @@ server0:
 server1:
     server_name: "Server1"
     listen: "8001"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -26,8 +22,6 @@ server1:
 server2:
     server_name: "Server2"
     listen: "8002"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -37,8 +31,6 @@ server2:
 server3:
     server_name: "Server3"
     listen: "8003"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -48,8 +40,6 @@ server3:
 server4:
     server_name: "Server4"
     listen: "8004"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -59,8 +49,6 @@ server4:
 server5:
     server_name: "Server5"
     listen: "8005"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -70,8 +58,6 @@ server5:
 server6:
     server_name: "Server6"
     listen: "8006"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -81,8 +67,6 @@ server6:
 server7:
     server_name: "Server7"
     listen: "8007"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -92,8 +76,6 @@ server7:
 server8:
     server_name: "Server8"
     listen: "8008"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -103,8 +85,6 @@ server8:
 server9:
     server_name: "Server9"
     listen: "8009"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -114,8 +94,6 @@ server9:
 server10:
     server_name: "Server10"
     listen: "8010"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -125,8 +103,6 @@ server10:
 server11:
     server_name: "Server11"
     listen: "8011"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -136,8 +112,6 @@ server11:
 server12:
     server_name: "Server12"
     listen: "8012"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -147,8 +121,6 @@ server12:
 server13:
     server_name: "Server13"
     listen: "8013"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -158,8 +130,6 @@ server13:
 server14:
     server_name: "Server14"
     listen: "8014"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -169,8 +139,6 @@ server14:
 server15:
     server_name: "Server15"
     listen: "8015"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -180,8 +148,6 @@ server15:
 server16:
     server_name: "Server16"
     listen: "8016"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -191,8 +157,6 @@ server16:
 server17:
     server_name: "Server17"
     listen: "8017"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -202,8 +166,6 @@ server17:
 server18:
     server_name: "Server18"
     listen: "8018"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -213,8 +175,6 @@ server18:
 server19:
     server_name: "Server19"
     listen: "8019"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -224,8 +184,6 @@ server19:
 server20:
     server_name: "Server20"
     listen: "8020"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -235,8 +193,6 @@ server20:
 server21:
     server_name: "Server21"
     listen: "8021"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -246,8 +202,6 @@ server21:
 server22:
     server_name: "Server22"
     listen: "8022"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -257,8 +211,6 @@ server22:
 server23:
     server_name: "Server23"
     listen: "8023"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -268,8 +220,6 @@ server23:
 server24:
     server_name: "Server24"
     listen: "8024"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -279,8 +229,6 @@ server24:
 server25:
     server_name: "Server25"
     listen: "8025"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -290,8 +238,6 @@ server25:
 server26:
     server_name: "Server26"
     listen: "8026"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -301,8 +247,6 @@ server26:
 server27:
     server_name: "Server27"
     listen: "8027"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -312,8 +256,6 @@ server27:
 server28:
     server_name: "Server28"
     listen: "8028"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -323,8 +265,6 @@ server28:
 server29:
     server_name: "Server29"
     listen: "8029"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -334,8 +274,6 @@ server29:
 server30:
     server_name: "Server30"
     listen: "8030"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -345,8 +283,6 @@ server30:
 server31:
     server_name: "Server31"
     listen: "8031"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -356,8 +292,6 @@ server31:
 server32:
     server_name: "Server32"
     listen: "8032"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -367,8 +301,6 @@ server32:
 server33:
     server_name: "Server33"
     listen: "8033"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -378,8 +310,6 @@ server33:
 server34:
     server_name: "Server34"
     listen: "8034"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -389,8 +319,6 @@ server34:
 server35:
     server_name: "Server35"
     listen: "8035"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -400,8 +328,6 @@ server35:
 server36:
     server_name: "Server36"
     listen: "8036"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -411,8 +337,6 @@ server36:
 server37:
     server_name: "Server37"
     listen: "8037"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -422,8 +346,6 @@ server37:
 server38:
     server_name: "Server38"
     listen: "8038"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -433,8 +355,6 @@ server38:
 server39:
     server_name: "Server39"
     listen: "8039"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -444,8 +364,6 @@ server39:
 server40:
     server_name: "Server40"
     listen: "8040"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -455,8 +373,6 @@ server40:
 server41:
     server_name: "Server41"
     listen: "8041"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -466,8 +382,6 @@ server41:
 server42:
     server_name: "Server42"
     listen: "8042"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -477,8 +391,6 @@ server42:
 server43:
     server_name: "Server43"
     listen: "8043"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -488,8 +400,6 @@ server43:
 server44:
     server_name: "Server44"
     listen: "8044"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -499,8 +409,6 @@ server44:
 server45:
     server_name: "Server45"
     listen: "8045"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -510,8 +418,6 @@ server45:
 server46:
     server_name: "Server46"
     listen: "8046"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -521,8 +427,6 @@ server46:
 server47:
     server_name: "Server47"
     listen: "8047"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -532,8 +436,6 @@ server47:
 server48:
     server_name: "Server48"
     listen: "8048"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"
@@ -543,8 +445,6 @@ server48:
 server49:
     server_name: "Server49"
     listen: "8049"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
     location:
         path: "/"

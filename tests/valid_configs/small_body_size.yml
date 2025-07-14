@@ -1,0 +1,10 @@
+# Small body size
+server0:
+    server_name: "localhost"
+    listen: "8080"
+
+    location:
+        path: "/"
+        root: "/minimal/"
+        methods: "POST"
+        max_client_body_size: 100

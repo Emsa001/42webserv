@@ -2,8 +2,6 @@
 server0:
     server_name: "MinimalServer"
     listen: "8080"
-    max_client_body_size: 1024
-    max_client_header_size: 512
 
     location:
         path: "/"

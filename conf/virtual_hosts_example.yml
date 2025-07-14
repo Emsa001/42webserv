@@ -7,8 +7,6 @@ log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([
 server0:
     server_name: "localhost"
     listen: "80"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
 
     location:
@@ -21,8 +19,6 @@ server0:
 server1:
     server_name: "example.com"
     listen: "80"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
 
     location:
@@ -35,8 +31,6 @@ server1:
 server2:
     server_name: "test.local"
     listen: "80"
-    max_client_body_size: 2048
-    max_client_header_size: 1024
     keep_alive: 15
 
     location:

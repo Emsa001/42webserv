@@ -112,16 +112,6 @@ TEST_F(ConfigTest, InvalidMissingListen) {
     EXPECT_FALSE(testConfigFile("tests/invalid_configs/missing_required_listen.yml"));
 }
 
-// Test missing required max_client_body_size
-TEST_F(ConfigTest, InvalidMissingMaxClientBodySize) {
-    EXPECT_FALSE(testConfigFile("tests/invalid_configs/missing_required_max_client_body_size.yml"));
-}
-
-// Test missing required max_client_header_size
-TEST_F(ConfigTest, InvalidMissingMaxClientHeaderSize) {
-    EXPECT_FALSE(testConfigFile("tests/invalid_configs/missing_required_max_client_header_size.yml"));
-}
-
 // Test missing required location path
 TEST_F(ConfigTest, InvalidMissingLocationPath) {
     EXPECT_FALSE(testConfigFile("tests/invalid_configs/missing_required_location_path.yml"));

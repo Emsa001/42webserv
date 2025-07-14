@@ -2,8 +2,6 @@
 server0:
     server_name: "DuplicateServer"
     listen: "8080"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
 
     location:
@@ -14,8 +12,6 @@ server0:
 server1:
     server_name: "DuplicateServer"
     listen: "8081"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
 
     location:

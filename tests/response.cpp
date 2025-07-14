@@ -116,24 +116,6 @@ TEST(WebservResponseTests, RequestBodyTooLarge)
 	EXPECT_EQ(response.getStatusCode(), 413); // 413 Payload Too Large
 }
 
-TEST(WebservResponseTests, RequestHeaderTooLarge)
-{
-	Config &config = Config::instance();
-	config.parse("conf/default.yml");
-	Server server(config.getServers()[0].getMap()); // MainServer
-
-	// Create a header that exceeds 1024 bytes
-	std::string largeHeader = "GET / HTTP/1.1\r\nHost: MainServer\r\n";
-	while (largeHeader.size() < 1100)
-		largeHeader += "X-Dummy-Header: value\r\n";
-	largeHeader += "\r\n";
-
-	HttpRequest request(largeHeader);
-	HttpResponse response = server.handleResponse(&request);
-
-	EXPECT_EQ(response.getStatusCode(), 431); // 431 Request Header Fields Too Large
-}
-
 TEST(WebservResponseTests, MethodNotAllowed)
 {
 	Config &config = Config::instance();
@@ -242,14 +224,14 @@ TEST(WebservResponseTests, PostWithValidBodySize)
 TEST(WebservResponseTests, SmallBodyLimitServer)
 {
 	Config &config = Config::instance();
-	config.parse("conf/default.yml");
-	Server server(config.getServers()[2].getMap()); // MyServer2 max_client_body_size: 256
+	config.parse("tests/valid_configs/small_body_size.yml");
+	Server server(config.getServers()[0].getMap()); // MyServer2 max_client_body_size: 256
 
 	std::string largeBody(300, 'B'); // Exceeds MyServer2's 256 limit
 
 	HttpRequest request(
 		"POST / HTTP/1.1\r\n"
-		"Host: MyServer2\r\n"
+		"Host: localhost\r\n"
 		"Content-Length: " + std::to_string(largeBody.size()) + "\r\n"
 		"Connection: close\r\n\r\n" +
 		largeBody

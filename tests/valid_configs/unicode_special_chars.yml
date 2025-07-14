@@ -5,8 +5,6 @@ server0:
     server_name: "UnicodeTestServer_ñáéíóú_中文_العربية_русский"
     listen: "8080"
     host: "localhost"
-    max_client_body_size: 4096
-    max_client_header_size: 1024
     keep_alive: 30
 
     location:
