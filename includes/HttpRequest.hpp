@@ -87,6 +87,7 @@ struct ClientRequestState {
     Server *server;
     // request data
     HttpRequest request;
+    std::string response;
 
     std::string buffer;
     bool headersComplete;

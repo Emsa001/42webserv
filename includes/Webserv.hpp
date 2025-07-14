@@ -10,6 +10,7 @@
 #define MAX_CLIENTS 10
 #define ROOT_DIR "./www/"
 #define ALLOWED_METHODS "GET POST DELETE"
+#define DEFAULT_SOCKET_TIMEOUT 30
 
 #include "Colors.hpp"
 

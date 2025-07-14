@@ -133,7 +133,7 @@ void SocketHandler::processConnection(int i)
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof(addr);
     struct pollfd newconn;
-    newconn.events = POLLIN | POLLERR | POLLHUP | POLLNVAL;
+    newconn.events = POLLIN | POLLOUT | POLLERR | POLLHUP | POLLNVAL;
     newconn.revents = 0;
     newconn.fd = accept(it->fd, (sockaddr *)&addr, &addrlen);
     if (newconn.fd < 0)
@@ -164,6 +164,7 @@ void SocketHandler::processConnection(int i)
     newReq.expectedSize = -1;
     newReq.headersComplete = false;
     newReq.request = HttpRequest("");
+    newReq.response.clear();
     newReq.buffer.clear();
     newReq.server = NULL;
 
@@ -171,6 +172,17 @@ void SocketHandler::processConnection(int i)
     _conns[newconn.fd] = newReq;
     // append to pollfds array
     _pollfds.push_back(newconn);
+    setConnectionTimeout(newReq.port, DEFAULT_SOCKET_TIMEOUT);
+}
+
+void SocketHandler::setConnectionTimeout(int fd, int timeout_sec) {
+    struct timeval sock_timeout;
+    sock_timeout.tv_usec = 0;
+    sock_timeout.tv_sec = timeout_sec;
+    int optval = 0;
+    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+    setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &sock_timeout, sizeof(sock_timeout));
+    setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &sock_timeout, sizeof(sock_timeout));
 }
 
 void SocketHandler::processData(int i)
@@ -184,12 +196,11 @@ void SocketHandler::processData(int i)
     // TODO: error check `res`
     if (res <= 0)
     {
-        Logger::error("recv() error");
+        Logger::info("recv() end");
         // std::cout << it->fd << std::endl;
         it->revents = 0;
         closeConnection(i);
         return;
-        // continue;//TODO
     }
 
     config_map conn_serv = _conns[it->fd].server ? _conns[it->fd].server->getConfig() : _servers[0].getConfig();
@@ -217,13 +228,7 @@ void SocketHandler::processData(int i)
         Logger::debug("keepalive is " + intToString(keep_alive));
         _conns[it->fd].keepalive = keep_alive;
 
-        struct timeval sock_timeout;
-        sock_timeout.tv_usec = 0;
-        sock_timeout.tv_sec = keep_alive;
-        int optval = 0;
-        setsockopt(it->fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
-        setsockopt(it->fd, SOL_SOCKET, SO_RCVTIMEO, &sock_timeout, sizeof(sock_timeout));
-        setsockopt(it->fd, SOL_SOCKET, SO_SNDTIMEO, &sock_timeout, sizeof(sock_timeout));
+        setConnectionTimeout(it->fd, keep_alive);
     }
 
     // if (!_conns[it->fd].keepalive)
@@ -232,33 +237,37 @@ void SocketHandler::processData(int i)
     HttpResponse response = _conns[it->fd].server->handleResponse(&_conns[it->fd].request);
     if (response.isInvalid()) // TODO: wait until request.isBodyComplete()
         return;
-    std::string responseStr = response.getResponse();
+    _conns[it->fd].response = response.getResponse();
+}
 
-    if (send(it->fd, responseStr.c_str(), responseStr.size(), 0) < 0)
+void SocketHandler::sendChunk(int i) {
+    // _poll_fds[i].
+    int res = send(_pollfds[i].fd, _conns[_pollfds[i].fd].response.c_str(), _conns[_pollfds[i].fd].response.size(), 0);
+    // std::cout << res << std::endl;
+    if (res < 0)
     {
-        Logger::error();
-        perror("error3: ");
-    }
-    Logger::debug("sent response");
-
-    _conns[it->fd].buffer.clear();
-    _conns[it->fd].contentLength = -1;
-    _conns[it->fd].headersComplete = false;
-    _conns[it->fd].request = HttpRequest();
-    if (!_conns[it->fd].keepalive)
-    {
+        Logger::error("send error");
+        // perror("error3: ");
         closeConnection(i);
     }
-    if (res <= 0)
+    _conns[_pollfds[i].fd].response.erase(0, res);
+    Logger::debug("sending response");
+
+    // reset request
+    // ready for new request on same connection
+    _conns[_pollfds[i].fd].buffer.clear();
+    _conns[_pollfds[i].fd].contentLength = -1;
+    _conns[_pollfds[i].fd].headersComplete = false;
+    _conns[_pollfds[i].fd].request = HttpRequest();
+    _conns[_pollfds[i].fd].response.clear();
+    if (!_conns[_pollfds[i].fd].keepalive)
     {
-        Logger::info("removing");
-        perror("error2: ");
+        closeConnection(i);
     }
 }
 
 void SocketHandler::closeConnection(int i)
 {
-
     close(_pollfds[i].fd);
     _conns.erase(_pollfds[i].fd);
     _pollfds.erase(_pollfds.begin() + i);
@@ -293,17 +302,16 @@ int SocketHandler::run()
                 // clear events if connection not yet closed
                 _pollfds[i].revents = 0;
             }
-            else if (_pollfds[i].revents & POLLERR)
-            {
-                if (i < _num_sockets)
-                    ;
-                // event was on socket
-                // processConnection(i);
-                else
-                    // event was on open connection
-                    // processData(i);
-                    closeConnection(i);
+            if (_pollfds[i].revents & POLLOUT) {
+                if (!_conns[_pollfds[i].fd].response.empty())
+                    sendChunk(i);
             }
+            if (_pollfds[i].revents & POLLERR)
+            {
+                if (i >= _num_sockets)
+                closeConnection(i);
+            }
+            _pollfds[i].revents = 0;
         }
     }
 }
