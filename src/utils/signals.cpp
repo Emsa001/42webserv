@@ -1,6 +1,5 @@
 #include "Webserv.hpp"
 
-
 void signalHandler(int signum)
 {
     stop = true;

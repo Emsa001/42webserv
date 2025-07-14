@@ -22,21 +22,21 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
 {
     if (message.empty() || message.size() <= 1)
         throw HttpRequestException(500);
-        
+
     response->setStatusCode(code);
 
     StringMultiMap headers = response->getHeaders();
 
     if (headers.find("Content-Type") == headers.end())
     {
-        if(code != 200)
-        response->setHeader("Content-Type", "text/plain");
+        if (code != 200)
+            response->setHeader("Content-Type", "text/plain");
         else
             response->setHeader("Content-Type", "text/html");
     }
     if (headers.find("Content-Length") == headers.end())
         response->setHeader("Content-Length", intToString(message.size()));
-        
+
     response->setBody(message);
     response->build();
 }
@@ -45,23 +45,23 @@ std::string close_pipes(int output_pipe[2], int input_pipe[2], bool child)
 {
     std::string output;
 
-    if(child)
+    if (child)
         dup2(output_pipe[1], STDOUT_FILENO);
-    
+
     close(output_pipe[1]);
-    if(!child)
+    if (!child)
         output = read_output(output_pipe[0]);
     close(output_pipe[0]);
 
-    if(child)
+    if (child)
         dup2(input_pipe[0], STDIN_FILENO);
     close(input_pipe[1]);
-    close(input_pipe[0]); 
+    close(input_pipe[0]);
 
     return output;
 }
 
-void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request) 
+void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request)
 {
     Type scriptType = detect_type(scriptPath);
 
@@ -97,7 +97,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
             throw HttpRequestException(500);
         }
     }
-    
+
     if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
     {
         const std::string &body = request->getBody();
@@ -112,25 +112,25 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
     int status;
     time_t start_time = time(NULL);
     bool timeout_occurred = false;
-    
+
     while (true)
     {
         pid_t result = waitpid(pid, &status, WNOHANG);
-        
+
         if (result > 0)
             break; // Child process has finished
         else if (result == -1)
             throw HttpRequestException(500); // waitpid error
-        
+
         // Check for timeout
         if (time(NULL) - start_time >= CGI_TIMEOUT)
         {
             timeout_occurred = true;
-            kill(pid, SIGKILL); // Force kill the child process
+            kill(pid, SIGKILL);       // Force kill the child process
             waitpid(pid, &status, 0); // Wait for the killed process to be reaped
             break;
         }
-        
+
         usleep(10000); // Sleep for 10ms to avoid busy waiting
     }
 

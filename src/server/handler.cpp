@@ -66,7 +66,7 @@ bool SocketHandler::InitSockets()
     hints.ai_flags = AI_PASSIVE;     //
 
     // Group servers by port to handle virtual hosts
-    std::map<int, std::vector<size_t> > portToServers;
+    std::map<int, std::vector<size_t>> portToServers;
     for (size_t i = 0; i < _servers.size(); ++i)
     {
         std::string const port = Config::getSafe(_servers[i].getConfig(), "listen");
@@ -75,7 +75,7 @@ bool SocketHandler::InitSockets()
     }
 
     // Create sockets for each unique port
-    for (std::map<int, std::vector<size_t> >::iterator portIt = portToServers.begin(); portIt != portToServers.end();
+    for (std::map<int, std::vector<size_t>>::iterator portIt = portToServers.begin(); portIt != portToServers.end();
          ++portIt)
     {
         int port_int = portIt->first;
@@ -175,7 +175,8 @@ void SocketHandler::processConnection(int i)
     setConnectionTimeout(newReq.port, DEFAULT_SOCKET_TIMEOUT);
 }
 
-void SocketHandler::setConnectionTimeout(int fd, int timeout_sec) {
+void SocketHandler::setConnectionTimeout(int fd, int timeout_sec)
+{
     struct timeval sock_timeout;
     sock_timeout.tv_usec = 0;
     sock_timeout.tv_sec = timeout_sec;
@@ -241,7 +242,8 @@ void SocketHandler::processData(int i)
     Logger::info("Status: " + intToString(response.getStatusCode()));
 }
 
-void SocketHandler::sendChunk(int i) {
+void SocketHandler::sendChunk(int i)
+{
     // _poll_fds[i].
     int res = send(_pollfds[i].fd, _conns[_pollfds[i].fd].response.c_str(), _conns[_pollfds[i].fd].response.size(), 0);
     // std::cout << res << std::endl;
@@ -304,14 +306,15 @@ int SocketHandler::run()
                 // clear events if connection not yet closed
                 _pollfds[i].revents = 0;
             }
-            if (_pollfds[i].revents & POLLOUT) {
+            if (_pollfds[i].revents & POLLOUT)
+            {
                 if (!_conns[_pollfds[i].fd].response.empty())
                     sendChunk(i);
             }
             if (_pollfds[i].revents & POLLERR)
             {
                 if (i >= _num_sockets)
-                closeConnection(i);
+                    closeConnection(i);
             }
             _pollfds[i].revents = 0;
         }
