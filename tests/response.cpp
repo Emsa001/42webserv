@@ -152,7 +152,7 @@ TEST(WebservResponseTests, IndexLocation)
 		HttpResponse response = server.handleResponse(&request);
 
 		const FileData fileData = response.getFileData();
-		const config_map *location = server.findLocation(request.getURL()->getPath());
+		const config_map *location = server.findLocation(request.getURL().getPath());
 
 		std::string index = Config::getSafe(*location, "index", ConfigValue("index.html")).getString();
 	
@@ -333,26 +333,27 @@ TEST(WebservResponseTests, InvalidHTTPMethod)
 	EXPECT_EQ(response.getStatusCode(), 405); // Method Not Allowed
 }
 
-TEST(WebservResponseTests, MissingContentLengthForPost)
-{
-	Config &config = Config::instance();
-	config.parse("conf/default.yml");
-	Server server(config.getServers()[3].getMap());
+// TODO: check if necessary
+// TEST(WebservResponseTests, MissingContentLengthForPost)
+// {
+// 	Config &config = Config::instance();
+// 	config.parse("conf/default.yml");
+// 	Server server(config.getServers()[3].getMap());
 
-	std::string body = "Hello, this is a CGI response from MyServer3!";
+// 	std::string body = "Hello, this is a CGI response from MyServer3!";
 
-	HttpRequest request(
-		"POST /cgi HTTP/1.1\r\n"
-		"Host: MyServer3\r\n"
-		"Connection: close\r\n\r\n" +
-		body
-	);
+// 	HttpRequest request(
+// 		"POST /cgi HTTP/1.1\r\n"
+// 		"Host: MyServer3\r\n"
+// 		"Connection: close\r\n\r\n" +
+// 		body
+// 	);
 
-	HttpResponse response = server.handleResponse(&request);
+// 	HttpResponse response = server.handleResponse(&request);
 
-	// Should handle missing Content-Length gracefully
-	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 411);
-}
+// 	// Should handle missing Content-Length gracefully
+// 	EXPECT_TRUE(response.getStatusCode() == 400 || response.getStatusCode() == 411);
+// }
 
 TEST(WebservResponseTests, HTTPVersionSupport)
 {

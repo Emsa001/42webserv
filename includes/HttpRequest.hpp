@@ -11,6 +11,7 @@ class HttpURL {
         StringMap queryMap;
 
     public:
+        HttpURL() : path(""), query("") {}
         HttpURL(const std::string &url);
         ~HttpURL() {}
 
@@ -21,7 +22,7 @@ class HttpURL {
 
 class HttpRequest : public HttpMessage {
     private:
-        HttpURL *url;
+        HttpURL url;
         std::string method;
         std::string uri;
         std::string version;
@@ -39,14 +40,11 @@ class HttpRequest : public HttpMessage {
 
 
     public:
-        HttpRequest(const std::string &rawData="")
-            : url(NULL), rawRequestData(rawData), headersComplete(false), bodyComplete(false),
+        HttpRequest(const std::string &rawData="") : rawRequestData(rawData), headersComplete(false), bodyComplete(false),
             headerEnd(std::string::npos), content_length(-1) {
         }
 
-        virtual ~HttpRequest() { 
-            delete this->url; 
-        }
+        ~HttpRequest() { }
 
         void parseHeaders(const config_map &serverConfig);
         void parse(const config_map &serverConfig, const config_map &location);
@@ -62,7 +60,7 @@ class HttpRequest : public HttpMessage {
         const std::string &getMethod() const { return method; }
         const std::string &getURI() const { return uri; }
         const std::string &getVersion() const { return version; }
-        HttpURL *getURL() const { return url; }
+        HttpURL getURL() const { return url; }
         const std::string &getPort() const { return port; }
         const std::string &getRawRequestData() const { return rawRequestData; }
         int getBodyLength() { return body.size(); }

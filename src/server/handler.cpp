@@ -238,7 +238,6 @@ void SocketHandler::processData(int i)
     if (response.isInvalid())
         return;
     _conns[it->fd].response = response.getResponse();
-    delete response.getRequest()->getURL();
 }
 
 void SocketHandler::sendChunk(int i) {

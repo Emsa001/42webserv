@@ -29,7 +29,7 @@ HttpResponse Server::handleResponse(HttpRequest *request)
         response.setHeader("Connection", request->getHeader("Connection") == "keep-alive" ? "keep-alive" : "close");
         
         // Find the location
-        const config_map *location = this->findLocation(request->getURL()->getPath());
+        const config_map *location = this->findLocation(request->getURL().getPath());
         if (location == NULL)
             throw HttpRequestException(404); // No matching location found
         
@@ -39,7 +39,7 @@ HttpResponse Server::handleResponse(HttpRequest *request)
             return response;
 
         // Attempt to create file data for the requested resource
-        FileData fileData = this->createFileData(location, request->getURL()->getPath());
+        FileData fileData = this->createFileData(location, request->getURL().getPath());
         response.setFileData(fileData);
     
         // Check if the file exists
