@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto+Mono:wght@400&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto Mono', monospace;
+  background: linear-gradient(135deg, #1c1b33, #2c3e50);
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  max-width: 700px;
+  width: 100%;
+  text-align: center;
+}
+
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: #ffda77;
+  margin-bottom: 1rem;
+}
+
+#load-btn {
+  margin-top: 1rem;
+  padding: 0.7rem 1.4rem;
+  background-color: #ffda77;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #2c2c2c;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#load-btn:hover {
+  background-color: #ffe299;
+  transform: scale(1.05);
+}
+
+main {
+  margin-top: 2rem;
+}
+
+#quote-text {
+  font-size: 1.5rem;
+  font-style: italic;
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+#quote-author {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #a0e7e5;
+}
+
+footer {
+  margin-top: 2rem;
+}
+
+#error-message {
+  color: #ff6b6b;
+  font-style: italic;
+}

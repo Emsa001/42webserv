@@ -1,0 +1,10 @@
+# Wrong data type: server_name should be STRING not INT
+server0:
+    server_name: 123
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"

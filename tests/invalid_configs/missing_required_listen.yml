@@ -1,0 +1,9 @@
+# Missing required listen field
+server0:
+    server_name: "MainServer"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"

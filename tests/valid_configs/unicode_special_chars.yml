@@ -1,0 +1,30 @@
+# Unicode and special characters test
+log_format: "🚀 [server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B 🎯"
+
+server0:
+    server_name: "UnicodeTestServer_ñáéíóú_中文_العربية_русский"
+    listen: "8080"
+    host: "localhost"
+    keep_alive: 30
+
+    location:
+        path: "/测试/αβγ/тест"
+        root: "/unicode/测试/"
+        methods: "GET POST"
+        index: "índex_ñáéíóú.html"
+    
+    location:
+        path: "/special-chars!@#$%^&*()"
+        root: "/special/"
+        methods: "GET"
+        autoindex: true
+    
+    location:
+        path: "/very/long/path/with/many/segments/that/tests/deep/nesting/capability/of/the/parser/system"
+        root: "/deep/"
+        methods: "GET"
+    
+    errors:
+        404: "错误页面_404.html"
+        500: "صفحة_خطأ_500.html"
+        403: "страница_ошибки_403.html"

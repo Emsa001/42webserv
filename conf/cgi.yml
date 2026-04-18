@@ -1,0 +1,48 @@
+server:
+    server_name: "127.0.0.1"
+    listen: "8080"
+    keep_alive: 30
+
+    location:
+        methods: "GET"
+        path: "/"
+        root: "/myserver1/"
+        index: "index.html"
+        
+    location:
+        path: "/beqa"
+        root: "/1/"
+        index: "beqa.html"
+
+    location:
+        methods: "POST DELETE GET"
+        cgi: true
+        path: "/cgi-bin"
+        root: "/cgi-bin/"
+
+    location:
+        methods: "POST DELETE GET"
+        cgi: true
+        path: "/cgi-test"
+        root: "/cgi-test/"
+
+    location:
+        methods: "POST DELETE GET"
+        cgi: true
+        path: "/runCgi"
+        root: "/cgi-test/"
+        index: "query.py"
+        exact: true
+
+    errors:
+        500: "500.html"
+
+server2:
+    server_name: "localhost"
+    listen: 81
+    keep_alive: 30
+
+    location:
+        path: "/pabecka"
+        root: "/1"
+        autoindex: true

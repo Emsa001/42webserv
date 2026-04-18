@@ -1,0 +1,11 @@
+# Wrong data type: autoindex should be BOOL not STRING
+server0:
+    server_name: "MainServer"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"
+        autoindex: "true"

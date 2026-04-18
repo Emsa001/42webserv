@@ -1,0 +1,13 @@
+# Unknown field 'bad_root_field' in root block
+log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
+bad_root_field: "invalid"
+
+server0:
+    server_name: "MainServer"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"

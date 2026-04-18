@@ -1,0 +1,16 @@
+# Extremely long string values - testing buffer limits
+server0:
+    server_name: "ThisIsAnExtremelyLongServerNameThatShouldTestTheParserBufferLimitsAndMaybeBreakSomethingIfTheParserDoesNotHandleLongStringsProperlyThisStringIsIntentionallyVeryLongToTestEdgeCasesAndBufferOverflowScenarios1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    listen: "8080"
+    keep_alive: 30
+
+    location:
+        path: "/this/is/an/extremely/long/path/that/should/test/the/parser/limits/and/maybe/break/something/if/the/parser/does/not/handle/long/paths/properly/this/path/is/intentionally/very/long/to/test/edge/cases/and/buffer/overflow/scenarios/1234567890/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/more/path/segments/to/make/it/even/longer/testing/testing/testing"
+        root: "/this/is/an/extremely/long/root/path/that/should/test/the/parser/limits/and/maybe/break/something/if/the/parser/does/not/handle/long/root/paths/properly/this/root/path/is/intentionally/very/long/to/test/edge/cases/and/buffer/overflow/scenarios/1234567890/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/"
+        methods: "GET POST PUT DELETE PATCH HEAD OPTIONS TRACE CONNECT CUSTOM1 CUSTOM2 CUSTOM3 CUSTOM4 CUSTOM5"
+        index: "index.html"
+        upload_path: "/this/is/an/extremely/long/upload/path/that/should/test/the/parser/limits/and/maybe/break/something/if/the/parser/does/not/handle/long/upload/paths/properly/this/upload/path/is/intentionally/very/long/to/test/edge/cases/and/buffer/overflow/scenarios/1234567890/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/"
+        redirect: "http://this.is.an.extremely.long.redirect.url.that.should.test.the.parser.limits.and.maybe.break.something.if.the.parser.does.not.handle.long.redirect.urls.properly.this.redirect.url.is.intentionally.very.long.to.test.edge.cases.and.buffer.overflow.scenarios.1234567890.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.com/path/to/extremely/long/redirect/destination"
+        autoindex: false
+        exact: true
+        cgi: "not_a_boolean_value_this_should_be_bool"

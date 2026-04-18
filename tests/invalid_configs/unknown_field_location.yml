@@ -1,0 +1,11 @@
+# Unknown field 'invalid_location_field' in location block
+server0:
+    server_name: "MainServer"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"
+        invalid_location_field: "bad"

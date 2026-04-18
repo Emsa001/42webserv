@@ -1,0 +1,40 @@
+# Example configuration showing multiple virtual hosts on the same port
+# This demonstrates how to handle different domains on port 80
+
+log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
+
+# Second virtual host on the SAME port 80 but different domain
+server0:
+    server_name: "localhost"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/virtual/"
+        index: "index1.html"
+        methods: "GET"
+
+# First virtual host on port 80
+server1:
+    server_name: "example.com"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/virtual/"
+        index: "index2.html"
+        methods: "GET"
+
+# Third virtual host on the SAME port 80 but different domain
+server2:
+    server_name: "test.local"
+    listen: "80"
+    keep_alive: 15
+
+    location:
+        path: "/"
+        root: "/virtual/"
+        index: "index3.html"
+        methods: "GET"

@@ -1,0 +1,452 @@
+# Massive configuration with 50 servers - testing parser limits
+log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
+
+server0:
+    server_name: "Server0"
+    listen: "8000"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server0/"
+        methods: "GET"
+
+server1:
+    server_name: "Server1"
+    listen: "8001"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server1/"
+        methods: "GET"
+
+server2:
+    server_name: "Server2"
+    listen: "8002"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server2/"
+        methods: "GET"
+
+server3:
+    server_name: "Server3"
+    listen: "8003"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server3/"
+        methods: "GET"
+
+server4:
+    server_name: "Server4"
+    listen: "8004"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server4/"
+        methods: "GET"
+
+server5:
+    server_name: "Server5"
+    listen: "8005"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server5/"
+        methods: "GET"
+
+server6:
+    server_name: "Server6"
+    listen: "8006"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server6/"
+        methods: "GET"
+
+server7:
+    server_name: "Server7"
+    listen: "8007"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server7/"
+        methods: "GET"
+
+server8:
+    server_name: "Server8"
+    listen: "8008"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server8/"
+        methods: "GET"
+
+server9:
+    server_name: "Server9"
+    listen: "8009"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server9/"
+        methods: "GET"
+
+server10:
+    server_name: "Server10"
+    listen: "8010"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server10/"
+        methods: "GET"
+
+server11:
+    server_name: "Server11"
+    listen: "8011"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server11/"
+        methods: "GET"
+
+server12:
+    server_name: "Server12"
+    listen: "8012"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server12/"
+        methods: "GET"
+
+server13:
+    server_name: "Server13"
+    listen: "8013"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server13/"
+        methods: "GET"
+
+server14:
+    server_name: "Server14"
+    listen: "8014"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server14/"
+        methods: "GET"
+
+server15:
+    server_name: "Server15"
+    listen: "8015"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server15/"
+        methods: "GET"
+
+server16:
+    server_name: "Server16"
+    listen: "8016"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server16/"
+        methods: "GET"
+
+server17:
+    server_name: "Server17"
+    listen: "8017"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server17/"
+        methods: "GET"
+
+server18:
+    server_name: "Server18"
+    listen: "8018"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server18/"
+        methods: "GET"
+
+server19:
+    server_name: "Server19"
+    listen: "8019"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server19/"
+        methods: "GET"
+
+server20:
+    server_name: "Server20"
+    listen: "8020"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server20/"
+        methods: "GET"
+
+server21:
+    server_name: "Server21"
+    listen: "8021"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server21/"
+        methods: "GET"
+
+server22:
+    server_name: "Server22"
+    listen: "8022"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server22/"
+        methods: "GET"
+
+server23:
+    server_name: "Server23"
+    listen: "8023"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server23/"
+        methods: "GET"
+
+server24:
+    server_name: "Server24"
+    listen: "8024"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server24/"
+        methods: "GET"
+
+server25:
+    server_name: "Server25"
+    listen: "8025"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server25/"
+        methods: "GET"
+
+server26:
+    server_name: "Server26"
+    listen: "8026"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server26/"
+        methods: "GET"
+
+server27:
+    server_name: "Server27"
+    listen: "8027"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server27/"
+        methods: "GET"
+
+server28:
+    server_name: "Server28"
+    listen: "8028"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server28/"
+        methods: "GET"
+
+server29:
+    server_name: "Server29"
+    listen: "8029"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server29/"
+        methods: "GET"
+
+server30:
+    server_name: "Server30"
+    listen: "8030"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server30/"
+        methods: "GET"
+
+server31:
+    server_name: "Server31"
+    listen: "8031"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server31/"
+        methods: "GET"
+
+server32:
+    server_name: "Server32"
+    listen: "8032"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server32/"
+        methods: "GET"
+
+server33:
+    server_name: "Server33"
+    listen: "8033"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server33/"
+        methods: "GET"
+
+server34:
+    server_name: "Server34"
+    listen: "8034"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server34/"
+        methods: "GET"
+
+server35:
+    server_name: "Server35"
+    listen: "8035"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server35/"
+        methods: "GET"
+
+server36:
+    server_name: "Server36"
+    listen: "8036"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server36/"
+        methods: "GET"
+
+server37:
+    server_name: "Server37"
+    listen: "8037"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server37/"
+        methods: "GET"
+
+server38:
+    server_name: "Server38"
+    listen: "8038"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server38/"
+        methods: "GET"
+
+server39:
+    server_name: "Server39"
+    listen: "8039"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server39/"
+        methods: "GET"
+
+server40:
+    server_name: "Server40"
+    listen: "8040"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server40/"
+        methods: "GET"
+
+server41:
+    server_name: "Server41"
+    listen: "8041"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server41/"
+        methods: "GET"
+
+server42:
+    server_name: "Server42"
+    listen: "8042"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server42/"
+        methods: "GET"
+
+server43:
+    server_name: "Server43"
+    listen: "8043"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server43/"
+        methods: "GET"
+
+server44:
+    server_name: "Server44"
+    listen: "8044"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server44/"
+        methods: "GET"
+
+server45:
+    server_name: "Server45"
+    listen: "8045"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server45/"
+        methods: "GET"
+
+server46:
+    server_name: "Server46"
+    listen: "8046"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server46/"
+        methods: "GET"
+
+server47:
+    server_name: "Server47"
+    listen: "8047"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server47/"
+        methods: "GET"
+
+server48:
+    server_name: "Server48"
+    listen: "8048"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server48/"
+        methods: "GET"
+
+server49:
+    server_name: "Server49"
+    listen: "8049"
+    keep_alive: 30
+    location:
+        path: "/"
+        root: "/server49/"
+        methods: "GET"

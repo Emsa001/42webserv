@@ -1,0 +1,9 @@
+# Missing required path field in location
+server0:
+    server_name: "MainServer"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        root: "/mainserver/"
+        methods: "GET"

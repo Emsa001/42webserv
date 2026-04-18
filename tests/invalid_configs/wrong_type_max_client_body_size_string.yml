@@ -1,0 +1,11 @@
+# Wrong data type: max_client_body_size should be INT not STRING
+server0:
+    server_name: "MainServer"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        max_client_body_size: "4096"
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"

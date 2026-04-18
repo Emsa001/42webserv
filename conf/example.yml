@@ -1,0 +1,43 @@
+# Available Log Format Variables:
+# -----------------------------------------
+# [server]  - Server name (e.g., my-server)
+# [date]    - Current date (e.g., 2025-04-16)
+# [time]    - Current time (e.g., 14:32:10)
+# [method]  - HTTP method (e.g., GET, POST)
+# [uri]     - Requested URI (e.g., /api/users)
+# [status]  - HTTP status code (e.g., 200, 404)
+# [reason]  - Status reason phrase (e.g., OK, Not Found)
+# [size]    - Response size in bytes (e.g., 512, 0)
+
+log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
+
+server0:
+    server_name: "localhost"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"
+
+server1:
+    server_name: "example.com"
+    listen: "80"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/myserver1/"
+        methods: "GET"
+    
+    location:
+        path: "/redirect"
+        root: "/myserver1/"
+        methods: "GET"  
+        redirect: "http://localhost:8080/"
+
+    errors:
+        500: "500.html"
+        404: "myserver1/errors/404.html"
+

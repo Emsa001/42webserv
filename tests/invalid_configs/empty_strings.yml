@@ -1,0 +1,10 @@
+# Empty strings test - should be invalid
+server0:
+    server_name: ""
+    listen: ""
+    keep_alive: 30
+
+    location:
+        path: ""
+        root: ""
+        methods: ""

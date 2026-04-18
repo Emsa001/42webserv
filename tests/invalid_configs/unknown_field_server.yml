@@ -1,0 +1,11 @@
+# Unknown field 'unknown_field' in server block
+server0:
+    server_name: "MainServer"
+    listen: "80"
+    keep_alive: 30
+    unknown_field: "invalid"
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"

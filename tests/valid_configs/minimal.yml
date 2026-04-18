@@ -1,0 +1,9 @@
+# Minimal valid configuration
+server0:
+    server_name: "MinimalServer"
+    listen: "8080"
+
+    location:
+        path: "/"
+        root: "/minimal/"
+        methods: "GET"

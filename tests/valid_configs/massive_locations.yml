@@ -1,0 +1,406 @@
+# Server with 100 location blocks - testing location parser limits
+server0:
+    server_name: "LocationStressTest"
+    listen: "8080"
+    keep_alive: 30
+
+    location:
+        path: "/path0"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path1"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path2"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path3"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path4"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path5"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path6"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path7"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path8"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path9"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path10"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path11"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path12"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path13"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path14"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path15"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path16"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path17"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path18"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path19"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path20"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path21"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path22"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path23"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path24"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path25"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path26"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path27"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path28"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path29"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path30"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path31"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path32"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path33"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path34"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path35"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path36"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path37"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path38"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path39"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path40"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path41"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path42"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path43"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path44"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path45"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path46"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path47"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path48"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path49"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path50"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path51"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path52"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path53"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path54"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path55"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path56"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path57"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path58"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path59"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path60"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path61"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path62"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path63"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path64"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path65"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path66"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path67"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path68"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path69"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path70"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path71"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path72"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path73"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path74"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path75"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path76"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path77"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path78"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path79"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path80"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path81"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path82"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path83"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path84"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path85"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path86"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path87"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path88"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path89"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path90"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path91"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path92"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path93"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path94"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path95"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path96"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path97"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path98"
+        root: "/server/"
+        methods: "GET"
+    location:
+        path: "/path99"
+        root: "/server/"
+        methods: "GET"

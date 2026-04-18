@@ -1,0 +1,53 @@
+log_format: "[test] | [date] [time] | [method] [uri] | [status]"
+
+server0:
+    server_name: "LocationTestServer"
+    listen: "8080"
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/root/"
+        methods: "GET"
+        index: "index.html"
+
+    location:
+        path: "/api"
+        root: "/api/"
+        methods: "GET POST"
+
+    location:
+        path: "/api/v1"
+        root: "/api/v1/"
+        methods: "GET POST PUT"
+
+    location:
+        path: "/static"
+        root: "/static/"
+        methods: "GET"
+        exact: true
+
+    location:
+        path: "/"
+        extension: ".php"
+        root: "/php/"
+        methods: "GET POST"
+        cgi: true
+
+    location:
+        path: "/"
+        extension: ".py"
+        root: "/cgi-bin/"
+        methods: "GET POST"
+        cgi: true
+
+    location:
+        path: "/uploads"
+        root: "/uploads/"
+        methods: "PUT POST"
+
+    location:
+        path: "/downloads"
+        extension: ".zip"
+        root: "/downloads/"
+        methods: "GET"
